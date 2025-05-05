@@ -24,6 +24,7 @@ public class CozeClient {
         Request request = new Request.Builder()
                 .url("https://api.coze.cn/v1/workflow/run")
                 .post(body)
+                // todo 配置化
                 .addHeader("Authorization", "Bearer pat_h1zJDVSnghxBxOcS3KlYgX8kdzOqGCjZCt5CMMSLBJWX3XXCeawkeeQgSKgsheZk")
                 .addHeader("Content-Type", "application/json")
                 .build();
