@@ -1,6 +1,9 @@
 # 开发中
 期待fork贡献
 
+
+开发QQ群：970315394
+
 ## 环境配置
 大模型api-key获取：阿里百炼平台 https://bailian.console.aliyun.com/?spm=5176.29597918.J_SEsSjsNv72yRuRFS2VknO.2.635b7ca0Mz7cuE&tab=model#/api-key
 
