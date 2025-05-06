@@ -1,4 +1,4 @@
-package com.iohw.knobot.interceptor.handler;
+package com.iohw.knobot.hook.interceptor.handler;
 
 import com.iohw.knobot.common.response.Result;
 import org.springframework.web.bind.annotation.ExceptionHandler;

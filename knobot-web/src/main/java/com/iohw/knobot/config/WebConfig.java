@@ -1,8 +1,11 @@
 package com.iohw.knobot.config;
 
-import com.iohw.knobot.interceptor.DocumentUploadInterceptor;
-import com.iohw.knobot.interceptor.GlobalLoginInterceptor;
+import com.iohw.knobot.hook.filter.ReqFilter;
+import com.iohw.knobot.hook.interceptor.DocumentUploadInterceptor;
+import com.iohw.knobot.hook.interceptor.GlobalLoginInterceptor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -50,5 +53,14 @@ public class WebConfig implements WebMvcConfigurer {
 //        registry.addInterceptor(globalLoginInterceptor)
 //                .addPathPatterns("/**")
 //                .excludePathPatterns(loginExcludeUrls);
+    }
+
+    @Bean
+    public FilterRegistrationBean<ReqFilter> reqFilter() {
+        FilterRegistrationBean<ReqFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(new ReqFilter());
+        filterRegistrationBean.addUrlPatterns("/*");
+        filterRegistrationBean.setOrder(1);
+        return filterRegistrationBean;
     }
 }

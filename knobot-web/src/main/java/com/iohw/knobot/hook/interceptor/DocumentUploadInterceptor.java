@@ -1,4 +1,4 @@
-package com.iohw.knobot.interceptor;
+package com.iohw.knobot.hook.interceptor;
 
 import com.iohw.knobot.common.exception.BusinessException;
 import com.iohw.knobot.utils.ThreadLocalUtils;
