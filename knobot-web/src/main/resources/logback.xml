@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <springProperty scope="context" name="LOG_PATH" source="log.path" defaultValue="logs"/>
+    <property name="LOG_FILE" value="${LOG_PATH}/app.log" />
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>[%d{yyyy-MM-dd HH:mm:ss}] [%t] [%X{REQ_ID}] [%p] %c - %m%n</Pattern>
+        </layout>
+    </appender>
+
+    <!-- 文件输出，带时间滚动 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 当前日志写入的文件 -->
+        <file>${LOG_FILE}</file>
+
+        <!-- 滚动策略：按天滚动 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 每天一个新文件，命名带日期 -->
+            <fileNamePattern>${LOG_PATH}/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- 保留30天的历史日志 -->
+            <maxHistory>30</maxHistory>
+
+            <!-- 总日志大小限制（可选） -->
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss}] [%t] [%X{REQ_ID}] [%p] %c - %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>

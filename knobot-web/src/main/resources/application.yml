@@ -7,7 +7,7 @@ spring:
     password:
     url: jdbc:mysql://localhost:3306/knobot?useUnicode=true&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&characterSetResults=utf8mb4&connectionCollation=utf8mb4_unicode_ci
   mail:
-    username: 3979892804@qq.com
+    username:
     password:
     host: smtp.qq.com
     port: 587
@@ -29,61 +29,27 @@ spring:
       host:
       port: 6379
       database: 15
-
+  config:
+    import: application-ai.yml
 
 server:
   port: 8080
 
-# MyBatis Configuration
+
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   configuration:
     map-underscore-to-camel-case: true
 
-# LangChain4j Configuration
-langchain4j:
-  community:
-    dashscope:
-      tokenizer:
-        api-key: ${DASHSCOPE_API_KEY}
-        model-name: qwen-plus
-      # LLM
-      chat-model:
-        api-key: ${DASHSCOPE_API_KEY}
-        model-name: qwen-plus
-        temperature: 0.7
-      # Streaming LLM
-      streaming-chat-model:
-        api-key: ${DASHSCOPE_API_KEY}
-        model-name: qwen-plus
-      # Embedding model
-      embedding-model:
-        api-key: ${DASHSCOPE_API_KEY}
-        model-name: text-embedding-v3
-        dimensions: 1024
-
-# PgVector Configuration
-pgvector:
-  database: vecdb
-  host:
-  port: 5432
-  user: postgres
-  password:
-  table: vectors_db
-
-
-search:
-  engine: google
-  api-key:
-
-llm:
-  apikey:
-  model: deepseek-reasoner
-  baseUrl: https://api.deepseek.com
 
 mail:
-  from-address: 3979892804@qq.com
-  to-address: 2023321332@qq.com
+  from-address:
+  to-address:
 
+# 文件上传方式
 upload:
   way: local
+
+# 日志地址
+log:
+  path: logs

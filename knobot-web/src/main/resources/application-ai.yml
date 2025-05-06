@@ -1,0 +1,40 @@
+langchain4j:
+  community:
+    dashscope:
+      tokenizer:
+        api-key: ${DASHSCOPE_API_KEY}
+        model-name: qwen-plus
+      # LLM
+      chat-model:
+        api-key: ${DASHSCOPE_API_KEY}
+        model-name: qwen-plus
+        temperature: 0.7
+      # Streaming LLM
+      streaming-chat-model:
+        api-key: ${DASHSCOPE_API_KEY}
+        model-name: qwen-plus
+      # Embedding model
+      embedding-model:
+        api-key: ${DASHSCOPE_API_KEY}
+        model-name: text-embedding-v3
+        dimensions: 1024
+
+# Embedding model - PgVector
+pgvector:
+  database: vecdb
+  host:
+  port: 5432
+  user: postgres
+  password:
+  table: vectors_db
+
+# search engine
+search:
+  engine: google
+  api-key:
+
+# personal LLM
+llm:
+  apikey:
+  model: deepseek-reasoner
+  baseUrl: https://api.deepseek.com
