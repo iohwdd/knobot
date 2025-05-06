@@ -32,7 +32,7 @@ build/
 ### VS Code ###
 .vscode/
 
-./documents
+.doc
 ./files
 
 **/**/resources/application.yml

@@ -10,6 +10,8 @@ import com.iohw.knobot.library.model.vo.KnowledgeLibDocumentVO;
 import com.iohw.knobot.library.request.CreateKnowledgeLibDocCommand;
 import com.iohw.knobot.library.request.DeleteKnowledgeLibDocCommand;
 import com.iohw.knobot.library.request.UpdateKnowledgeLibDocCommand;
+import com.iohw.knobot.upload.FileUploadFactory;
+import com.iohw.knobot.upload.LocalUploadFileStrategy;
 import com.iohw.knobot.upload.UploadFileStrategy;
 import com.iohw.knobot.utils.FileUtils;
 import com.iohw.knobot.utils.IdGeneratorUtil;
@@ -35,8 +37,8 @@ import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.load
 public class KnowledgeLibDocumentServiceImpl implements KnowledgeLibDocumentService {
     private final KnowledgeLibDocumentMapper documentMapper;
     private final KnowledgeLibService knowledgeLibService;
-    private final UploadFileStrategy uploadFileStrategy;
     private final EmbeddingStoreIngestor ingestor;
+    private final FileUploadFactory fileUploadFactory;
 
     @Override
     public void addDocument(CreateKnowledgeLibDocCommand command) {
@@ -45,13 +47,20 @@ public class KnowledgeLibDocumentServiceImpl implements KnowledgeLibDocumentServ
         documentDO.setDocumentDesc(command.getDocumentDesc());
         documentDO.setDocumentId(IdGeneratorUtil.generateDocId());
         documentDO.setKnowledgeLibId(command.getKnowledgeLibId());
-        FileUploadDto upload = uploadFileStrategy.upload(command.getFile(), "/documents");
+        FileUploadDto upload = fileUploadFactory.getUploadStrategy().upload(command.getFile(), "doc");
+
+        //todo 上传到本地 - 向量数据库加载貌似必须从本地文件中导入，后面看看有没有解决方法
+        LocalUploadFileStrategy fileStrategy = new LocalUploadFileStrategy();
+        FileUploadDto dto = fileStrategy.upload(command.getFile(), "/doc");
+
         documentDO.setPath(upload.getFilePath());
         documentDO.setDocumentSize(FileUtils.getFileSizeInMB(command.getFile()));
+        documentDO.setUrl(upload.getFileUrl());
+
         documentMapper.insert(documentDO);
 
         //更新向量数据库
-        loadFile2Store(upload.getFilePath());
+        loadFile2Store(dto.getFilePath());
 
         // 更新文档数量
         updateKnowledgeLibDocumentCount(documentDO.getKnowledgeLibId());
@@ -82,14 +91,13 @@ public class KnowledgeLibDocumentServiceImpl implements KnowledgeLibDocumentServ
     }
 
     @Override
-
     public void updateDocument(UpdateKnowledgeLibDocCommand command) {
         KnowledgeLibDocumentDO documentDO = new KnowledgeLibDocumentDO();
         documentDO.setDocumentName(command.getDocumentName());
         documentDO.setDocumentDesc(command.getDocumentDesc());
         documentDO.setDocumentId(command.getDocumentId());
         if(command.getFile() != null) {
-            FileUploadDto upload = uploadFileStrategy.upload(command.getFile(), "/documents");
+            FileUploadDto upload = fileUploadFactory.getUploadStrategy().upload(command.getFile(), "doc");
             documentDO.setPath(upload.getFilePath());
             documentDO.setDocumentSize(FileUtils.getFileSizeInMB(command.getFile()));
         }

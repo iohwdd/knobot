@@ -16,11 +16,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class DocumentUploadInterceptor implements HandlerInterceptor {
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String contentType = request.getContentType();
-        if (contentType != null && contentType.startsWith("multipart/form-data")) {
-            throw new BusinessException("不支持文件上传");
-        }
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
         String uri = request.getRequestURL().toString();
         String memoryId = uri.substring(uri.lastIndexOf("/") + 1);
         String knowledgeLibId = request.getParameter("knowledgeLibId");

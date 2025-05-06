@@ -1,7 +1,0 @@
-### GET request to example server
-GET http://localhost:8080/chat/stream?memoryId=d2173304-fa3a-49a6-b3dc-d7dd70f07e92&input=我叫大王
-
-
-
-### test
-GET http://localhost:8080/chat/test

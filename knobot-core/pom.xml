@@ -72,6 +72,10 @@
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-web-search-engine-searchapi</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

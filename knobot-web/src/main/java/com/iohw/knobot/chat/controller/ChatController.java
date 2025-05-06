@@ -60,7 +60,7 @@ public class ChatController {
     @PostMapping("/upload")
     public Result<FileUploadVO> uploadFile(@RequestParam("file") MultipartFile file) {
         UploadFileStrategy uploadStrategy = fileUploadFactory.getUploadStrategy();
-        FileUploadDto uploadDto = uploadStrategy.upload(file, "/documents");
+        FileUploadDto uploadDto = uploadStrategy.upload(file, "doc");
 
         FileUploadVO fileUploadVO = FileUploadVO.builder()
                 .fileId(uploadDto.getFileId())

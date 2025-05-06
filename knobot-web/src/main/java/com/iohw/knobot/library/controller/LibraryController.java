@@ -32,7 +32,7 @@ public class LibraryController {
     }
 
     @PostMapping("/createKnowledgeLibDocument")
-    public Result<Void> createKnowledgeLibDocument(@RequestBody CreateKnowledgeLibDocCommand command) {
+    public Result<Void> createKnowledgeLibDocument(CreateKnowledgeLibDocCommand command) {
         knowledgeLibDocumentService.addDocument(command);
         return Result.success(null);
     }

@@ -27,9 +27,10 @@ public class FileUploadFactory implements ApplicationContextAware, InitializingB
 
     public UploadFileStrategy getUploadStrategy() {
         switch (uploadWay) {
-            case "local" :
+            case "local":
                 return map.get("localUploadFileStrategy");
-
+            case "oss":
+                return map.get("ossUploadFileStrategy");
         }
         return map.get(uploadWay);
     }
