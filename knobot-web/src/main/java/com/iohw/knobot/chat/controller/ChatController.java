@@ -2,6 +2,7 @@ package com.iohw.knobot.chat.controller;
 
 import com.iohw.knobot.chat.assistant.AssistantService;
 import com.iohw.knobot.chat.assistant.IAssistant.StreamingAssistant;
+import com.iohw.knobot.chat.assistant.IAssistant.SummarizeAssistant;
 import com.iohw.knobot.chat.assistant.IAssistant.WebSearchAssistant;
 import com.iohw.knobot.chat.model.dto.ChatSessionDto;
 import com.iohw.knobot.chat.model.dto.ChatMessageDto;
@@ -16,7 +17,9 @@ import com.iohw.knobot.chat.vo.ChatSessionVO;
 import com.iohw.knobot.common.dto.FileUploadDto;
 import com.iohw.knobot.common.response.Result;
 import com.iohw.knobot.upload.FileUploadFactory;
+import com.iohw.knobot.upload.LocalUploadFileStrategy;
 import com.iohw.knobot.upload.UploadFileStrategy;
+import com.iohw.knobot.utils.FileUtils;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentParser;
 import dev.langchain4j.data.document.parser.apache.tika.ApacheTikaDocumentParser;
@@ -50,17 +53,17 @@ import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.load
 public class ChatController {
     private final SessionSideBarService sessionSideBarService;
     private final ChatService chatService;
-    private final AssistantService assistantService;
     private final WebSearchAssistant webSearchAssistant;
-    private final FileUploadFactory fileUploadFactory;
     private final EmbeddingStoreIngestor ingestor;
+    private final AssistantService assistantService;
+    private final SummarizeAssistant summarizeAssistant;
 
     private static final Map<String, String> filePathMap = new HashMap<>();
 
     @PostMapping("/upload")
     public Result<FileUploadVO> uploadFile(@RequestParam("file") MultipartFile file) {
-        UploadFileStrategy uploadStrategy = fileUploadFactory.getUploadStrategy();
-        FileUploadDto uploadDto = uploadStrategy.upload(file, "doc");
+        UploadFileStrategy uploadStrategy = new LocalUploadFileStrategy();
+        FileUploadDto uploadDto = uploadStrategy.upload(file, "/tmp");
 
         FileUploadVO fileUploadVO = FileUploadVO.builder()
                 .fileId(uploadDto.getFileId())
@@ -75,6 +78,20 @@ public class ChatController {
     public SseEmitter chat(@PathVariable String memoryId, ChatRequest request) {
         SseEmitter emitter = new SseEmitter(-1L); // 无超时
         String fileId = request.getFileId();
+
+        // 判断是否是首次提问 - 更新标题
+        boolean isFirstQuestion = chatService.isFirstQuestion(memoryId);
+        if (isFirstQuestion) {
+            log.info("用户 {} 在会话 {} 中首次提问", request.getUserId(), memoryId);
+            String newTitle = summarizeAssistant.summarize(request.getUserMessage());
+            sessionSideBarService.updateChatConversationTitle(
+                    UpdateConversationTitleCommand.builder()
+                            .memoryId(memoryId)
+                            .newTitle(newTitle)
+                            .build()
+            );
+        }
+
         //上传了附件
         if(!StringUtils.isEmpty(fileId)) {
             String filePath = filePathMap.get(fileId);
@@ -122,6 +139,8 @@ public class ChatController {
         Path path = Paths.get(filePath).toAbsolutePath().normalize();
         DocumentParser parser = new ApacheTikaDocumentParser();
         Document document = loadDocument(path.toString(), parser);
+        // 删除临时文件
+        FileUtils.deleteFile(filePath);
         ingestor.ingest(document);
     }
 
@@ -142,7 +161,7 @@ public class ChatController {
 
     @PostMapping("/conversation-title-update")
     public Result<Void> updateChatConversationTitle(@RequestBody UpdateConversationTitleCommand command) {
-        return sessionSideBarService.deleteChatConversationTitleUpdate(command);
+        return sessionSideBarService.updateChatConversationTitle(command);
     }
 
     @GetMapping("/messages")

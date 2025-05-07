@@ -72,7 +72,7 @@ public class SessionSideBarServiceImpl implements SessionSideBarService {
     }
 
     @Override
-    public Result<Void> deleteChatConversationTitleUpdate(UpdateConversationTitleCommand command) {
+    public Result<Void> updateChatConversationTitle(UpdateConversationTitleCommand command) {
         chatConversationMapper.updateTitle(command.getMemoryId(), command.getNewTitle());
         return Result.success(null);
     }

@@ -26,4 +26,11 @@ public class ChatServiceImpl implements ChatService {
         List<ChatMessageDO> chatMessageDOS = chatMessageMapper.selectByMemoryId(memoryId);
         return Result.success(ChatMessageConverter.INSTANCE.toDtoList(chatMessageDOS));
     }
+
+    @Override
+    public boolean isFirstQuestion(String memoryId) {
+        // 查询该会话下用户发送的消息数量
+        List<ChatMessageDO> userMessages = chatMessageMapper.selectByMemoryIdAndRole(memoryId, "user");
+        return userMessages.isEmpty();
+    }
 }

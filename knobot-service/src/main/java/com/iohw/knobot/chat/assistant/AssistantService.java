@@ -1,6 +1,7 @@
 package com.iohw.knobot.chat.assistant;
 
 import com.iohw.knobot.chat.assistant.IAssistant.RAGAssistant;
+import com.iohw.knobot.chat.assistant.IAssistant.SummarizeAssistant;
 import com.iohw.knobot.chat.assistant.IAssistant.WebSearchAssistant;
 import com.iohw.knobot.chat.config.PersistentChatMemoryStore;
 import com.iohw.knobot.chat.config.ContentRetrieverFactory;
@@ -65,7 +66,7 @@ public class AssistantService {
         RetrievalAugmentor retrievalAugmentor = DefaultRetrievalAugmentor.builder()
                 .contentRetriever(contentRetrieverFactory.createRetriever(memoryId, knowledgeLibId))
                 .contentInjector(DefaultContentInjector.builder()
-                        .promptTemplate(PromptTemplate.from("{{userMessage}}\n文档/文件/附件的内容如下，你可以基于下面的内容回答：:\n{{contents}}"))
+                        .promptTemplate(PromptTemplate.from("{{userMessage}}\n文档/文件/附件的内容如下，你可以基于下面的内容回答:\n{{contents}}"))
                         .build())
                 .build();
 
@@ -97,7 +98,7 @@ public class AssistantService {
         RetrievalAugmentor retrievalAugmentor = DefaultRetrievalAugmentor.builder()
                 .queryRouter(queryRouter)
                 .contentInjector(DefaultContentInjector.builder()
-                        .promptTemplate(PromptTemplate.from("{{userMessage}}\n文档/文件/附件的内容如下，你可以基于下面的内容回答：:\n{{contents}}"))
+                        .promptTemplate(PromptTemplate.from("{{userMessage}}\n文档/文件/附件的内容如下，你可以基于下面的内容回答:\n{{contents}}"))
                         .build())
                 .build();
 
@@ -109,6 +110,13 @@ public class AssistantService {
                         .maxMessages(20)
                         .chatMemoryStore(chatMemoryStore)
                         .build())
+                .build();
+    }
+
+    @Bean
+    public SummarizeAssistant summarizeAssistant() {
+        return AiServices.builder(SummarizeAssistant.class)
+                .chatLanguageModel(chatLanguageModel)
                 .build();
     }
 }

@@ -3,6 +3,7 @@ package com.iohw.knobot.chat.mapper;
 import com.iohw.knobot.chat.model.ChatMessageDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -28,4 +29,13 @@ public interface ChatMessageMapper {
 
     // 统计指定 memoryId 的聊天记录总 token 数
     int sumTokensByMemoryId(@Param("memoryId") String memoryId);
+
+    /**
+     * 根据会话ID和角色查询消息
+     * @param memoryId 会话ID
+     * @param role 角色（user/assistant）
+     * @return 消息列表
+     */
+    @Select("SELECT * FROM chat_message WHERE memory_id = #{memoryId} AND role = #{role}")
+    List<ChatMessageDO> selectByMemoryIdAndRole(@Param("memoryId") String memoryId, @Param("role") String role);
 }

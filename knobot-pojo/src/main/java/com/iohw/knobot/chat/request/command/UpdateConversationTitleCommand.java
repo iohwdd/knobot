@@ -1,5 +1,6 @@
 package com.iohw.knobot.chat.request.command;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -8,6 +9,7 @@ import lombok.Data;
  * @description:
  */
 @Data
+@Builder
 public class UpdateConversationTitleCommand {
     private String memoryId;
     private String newTitle;

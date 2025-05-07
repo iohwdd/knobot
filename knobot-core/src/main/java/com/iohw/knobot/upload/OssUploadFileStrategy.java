@@ -26,7 +26,7 @@ public class OssUploadFileStrategy implements UploadFileStrategy {
             String url = OssUtil.upload(path, name, in);
             return FileUploadDto.builder()
                     .fileId(String.valueOf(System.currentTimeMillis()))
-                    .fileName(file.getOriginalFilename())
+                    .fileName(name)
                     .filePath(path)
                     .fileUrl(url)
                     .build();

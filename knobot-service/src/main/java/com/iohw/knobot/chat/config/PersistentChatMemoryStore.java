@@ -73,7 +73,7 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
             String enhancedContent = null;
             if(isUserMessageEnhanced(content)) {
                 enhancedContent = content;
-                originContent = content.substring(0, content.lastIndexOf("\n文档/文件/附件的内容如下，你可以基于下面的内容回答：:\n"));
+                originContent = content.substring(0, content.lastIndexOf("\n文档/文件/附件的内容如下，你可以基于下面的内容回答:\n"));
             }
             //int tokens = tokenizer.estimateTokenCountInMessage(chatMessage);
             ChatMessageDO chatHistoryDO = ChatMessageDO.builder()
@@ -130,7 +130,7 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
         throw new IllegalArgumentException("Unknown message type: " + message.getClass().getName());
     }
     private static boolean isUserMessageEnhanced(String userMessage) {
-        return userMessage.contains("\n文档/文件/附件的内容如下，你可以基于下面的内容回答：:\n");
+        return userMessage.contains("\n文档/文件/附件的内容如下，你可以基于下面的内容回答:\n");
     }
     private ToolExecutionResultMessage parseToolMessage(String content) {
         // 简单实现 - 实际应根据存储格式调整

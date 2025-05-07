@@ -16,7 +16,9 @@ import com.iohw.knobot.upload.UploadFileStrategy;
 import com.iohw.knobot.utils.FileUtils;
 import com.iohw.knobot.utils.IdGeneratorUtil;
 import dev.langchain4j.data.document.Document;
+import dev.langchain4j.data.document.DocumentParser;
 import dev.langchain4j.data.document.parser.TextDocumentParser;
+import dev.langchain4j.data.document.parser.apache.tika.ApacheTikaDocumentParser;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -49,9 +51,9 @@ public class KnowledgeLibDocumentServiceImpl implements KnowledgeLibDocumentServ
         documentDO.setKnowledgeLibId(command.getKnowledgeLibId());
         FileUploadDto upload = fileUploadFactory.getUploadStrategy().upload(command.getFile(), "doc");
 
-        //todo 上传到本地 - 向量数据库加载貌似必须从本地文件中导入，后面看看有没有解决方法
+        //todo 上传到本地，导入向量数据库后删除 - 向量数据库加载貌似必须从本地文件中导入，后面看看有没有解决方法
         LocalUploadFileStrategy fileStrategy = new LocalUploadFileStrategy();
-        FileUploadDto dto = fileStrategy.upload(command.getFile(), "/doc");
+        FileUploadDto dto = fileStrategy.upload(command.getFile(), "/tmp");
 
         documentDO.setPath(upload.getFilePath());
         documentDO.setDocumentSize(FileUtils.getFileSizeInMB(command.getFile()));
@@ -68,11 +70,14 @@ public class KnowledgeLibDocumentServiceImpl implements KnowledgeLibDocumentServ
 
     private void loadFile2Store(String filePath) {
         Path path = Paths.get(filePath).toAbsolutePath().normalize();
-        Document document = loadDocument(path.toString(), new TextDocumentParser());
+        DocumentParser parser = new ApacheTikaDocumentParser();
+        Document document = loadDocument(path.toString(), parser);
+        // 删除临时文件
+        FileUtils.deleteFile(filePath);
         ingestor.ingest(document);
     }
-    @Override
 
+    @Override
     public void batchAddDocuments(List<KnowledgeLibDocumentDO> documents) {
         if (!documents.isEmpty()) {
             documentMapper.batchInsert(documents);

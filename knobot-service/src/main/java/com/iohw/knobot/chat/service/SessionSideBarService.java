@@ -22,5 +22,6 @@ public interface SessionSideBarService {
 
     Result<Void> deleteChatConversation(DeleteConversationCommand request);
 
-    Result<Void> deleteChatConversationTitleUpdate(UpdateConversationTitleCommand command);
+    Result<Void> updateChatConversationTitle(UpdateConversationTitleCommand command);
+
 }

@@ -12,4 +12,11 @@ import java.util.List;
  */
 public interface ChatService {
     Result<List<ChatMessageDto>> queryHistoryMessages(String memoryId);
+
+    /**
+     * 判断是否是用户在该会话中的第一次提问
+     * @param memoryId 会话ID
+     * @return true 如果是第一次提问，false 否则
+     */
+    boolean isFirstQuestion(String memoryId);
 }
