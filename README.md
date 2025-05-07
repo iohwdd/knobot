@@ -9,7 +9,7 @@
 
 搜索引擎api-key获取：Searchapi（限额100次） https://www.searchapi.io/
 
-向量数据库pgvector安装： `docker pull ankane/pgvector` 创建库名为`vecdb`，表在成功启动时自动创建
+向量数据库pgvector安装： `docker pull ankane/pgvector` 创建库名为`vecdb`，向量表在成功启动时自动创建
 
 mysql初始化：脚本位于`knobot-service/src/main/resources/init.sql`
 
