@@ -9,10 +9,15 @@ import com.iohw.knobot.library.model.vo.KnowledgeLibNameVO;
 import com.iohw.knobot.library.model.vo.KnowledgeLibVO;
 import com.iohw.knobot.library.request.*;
 import com.iohw.knobot.utils.IdGeneratorUtil;
+import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.store.embedding.EmbeddingStore;
+import dev.langchain4j.store.embedding.filter.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static dev.langchain4j.store.embedding.filter.MetadataFilterBuilder.metadataKey;
 
 /**
  * @author: iohw
@@ -44,7 +49,7 @@ public class KnowledgeLibServiceImpl implements KnowledgeLibService {
     @Override
     public List<KnowledgeLibVO> queryLibraryDetailList(QueryLibraryDetailListRequest request) {
         List<KnowledgeLibDO> knowledgeLibDOS = knowledgeLibMapper.selectByUserId(request.getUserId());
-
+        if(knowledgeLibDOS.isEmpty()) return null;
         return KnowledgeLibConvert.INSTANCE.toVOList(knowledgeLibDOS);
     }
 
@@ -62,12 +67,15 @@ public class KnowledgeLibServiceImpl implements KnowledgeLibService {
         knowledgeLibMapper.updateDocumentCount(knowledgeLibId, count);
     }
 
+    final EmbeddingStore<TextSegment> embeddingStore;
     @Override
     public void deleteKnowledgeLib(DeleteKnowledgeLibCommand command) {
-        // 1.删除知识库关联的文档
+        // 1. 删除知识库关联的文档
         documentMapper.deleteByKnowledgeLibId(command.getKnowledgeLibId());
-        // 2.删除知识库
+        // 2. 删除知识库
         knowledgeLibMapper.deleteById(command.getKnowledgeLibId());
+        // 3. 删除向量数据库中的数据 - 根据元数据 knowledgeLibId 来删
+        embeddingStore.removeAll(metadataKey("knowledgeLibId").isEqualTo(command.getKnowledgeLibId()));
     }
 
     @Override

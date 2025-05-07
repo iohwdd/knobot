@@ -1,5 +1,7 @@
 package com.iohw.knobot.library.model;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -36,10 +38,12 @@ public class KnowledgeLibDO {
     /**
      * 创建时间
      */
+    @JSONField(format = "yyyy-MM-dd")
     private LocalDateTime createTime;
 
     /**
      * 更新时间
      */
+    @JSONField(format = "yyyy-MM-dd")
     private LocalDateTime updateTime;
 }

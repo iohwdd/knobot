@@ -77,7 +77,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     public boolean updateUserInfo(ModifyUserInfoRequest modifyUserInfoRequest) {
         UserInfoDO userInfo = new UserInfoDO();
         userInfo.setUserId(modifyUserInfoRequest.getUserId());
-        userInfo.setPassword(modifyUserInfoRequest.getPassword());
+        userInfo.setPassword(modifyUserInfoRequest.getNewPassword());
         userInfo.setNickname(modifyUserInfoRequest.getNickname());
         userInfo.setAvatarUrl(modifyUserInfoRequest.getAvatarUrl());
 
@@ -134,16 +134,15 @@ public class UserInfoServiceImpl implements UserInfoService {
         ThreadLocalUtils.set(REQ_CONTEXT, reqContext);
 
         UserInfoDto dto = UserInfoConverter.INSTANCE.toDto(user);
-        dto.setToken(token);
 
         // 响应添加cookie
-        Cookie cookie = new Cookie(TOKEN, dto.getToken());
+        Cookie cookie = new Cookie(TOKEN, token);
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setMaxAge(7 * 24 * 60 * 60);
         cookie.setPath("/");
         resp.addCookie(cookie);
-        resp.addCookie(new Cookie(TOKEN, dto.getToken()));
+        resp.addCookie(new Cookie(TOKEN, token));
 
         return dto;
     }

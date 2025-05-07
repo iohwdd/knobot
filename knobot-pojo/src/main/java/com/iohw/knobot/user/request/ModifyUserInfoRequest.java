@@ -10,7 +10,8 @@ import lombok.Data;
 @Data
 public class ModifyUserInfoRequest {
     private Long userId;
-    private String password;
+    private String newPassword;
     private String nickname;
     private String avatarUrl;
+    private String description;
 }

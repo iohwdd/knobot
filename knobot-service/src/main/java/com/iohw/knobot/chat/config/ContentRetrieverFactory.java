@@ -21,6 +21,12 @@ public class ContentRetrieverFactory {
     private final EmbeddingModel embeddingModel;
     private final EmbeddingStore<TextSegment> embeddingStore;
 
+    /**
+     * 检索器 - 设置元数据检索字段
+     * @param memoryId
+     * @param knowledgeId
+     * @return
+     */
     public EmbeddingStoreContentRetriever createRetriever(String memoryId, String knowledgeId) {
         if(!StringUtils.hasText(memoryId)) {
             return EmbeddingStoreContentRetriever.builder()

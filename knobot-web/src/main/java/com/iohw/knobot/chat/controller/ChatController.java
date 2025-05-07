@@ -14,6 +14,7 @@ import com.iohw.knobot.chat.vo.FileUploadVO;
 import com.iohw.knobot.chat.service.ChatService;
 import com.iohw.knobot.chat.service.SessionSideBarService;
 import com.iohw.knobot.chat.vo.ChatSessionVO;
+import com.iohw.knobot.common.annotation.MdcDot;
 import com.iohw.knobot.common.dto.FileUploadDto;
 import com.iohw.knobot.common.response.Result;
 import com.iohw.knobot.upload.FileUploadFactory;
@@ -74,6 +75,7 @@ public class ChatController {
         return Result.success(fileUploadVO);
     }
 
+    @MdcDot
     @GetMapping(value = "/{memoryId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chat(@PathVariable String memoryId, ChatRequest request) {
         SseEmitter emitter = new SseEmitter(-1L); // 无超时

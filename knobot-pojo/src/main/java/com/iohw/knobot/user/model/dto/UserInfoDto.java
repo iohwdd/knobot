@@ -15,5 +15,4 @@ public class UserInfoDto {
     private String userName;
     private String nickName;
     private String avatarUrl;
-    private String token;
 }
