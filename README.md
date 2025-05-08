@@ -1,17 +1,17 @@
 # 开发中
-期待fork贡献
-
 
 开发QQ群：970315394
 
 ## 环境配置
-大模型api-key获取：阿里百炼平台 https://bailian.console.aliyun.com/?spm=5176.29597918.J_SEsSjsNv72yRuRFS2VknO.2.635b7ca0Mz7cuE&tab=model#/api-key
+1. 大模型api-key获取：阿里百炼平台 https://bailian.console.aliyun.com/?spm=5176.29597918.J_SEsSjsNv72yRuRFS2VknO.2.635b7ca0Mz7cuE&tab=model#/api-key
 
-搜索引擎api-key获取：Searchapi（限额100次） https://www.searchapi.io/
+2. 搜索引擎api-key获取：Searchapi（免费额度100次） https://www.searchapi.io/
 
-向量数据库pgvector安装： `docker pull ankane/pgvector` 创建库名为`vecdb`，向量表在成功启动时自动创建
+3. 向量数据库pgvector安装： `docker pull ankane/pgvector` 创建库名为`vecdb`，向量表在成功启动时自动创建。以上三点内容的配置信息统一在`application-ai.yml`中配置。
 
-mysql初始化：脚本位于`knobot-service/src/main/resources/init.sql`
+4. mysql初始化：脚本位于`knobot-service/src/main/resources/init.sql`
+
+5. oss对象存储：创建好Bucket与密钥对`https://ram.console.aliyun.com/profile/access-keys?spm=5176.7933691.nav-v2-dropdown-my-aliyun.5.29852c47zR5EjH` ,配置好`application-oss.yml`
 
 
 **tips：**
