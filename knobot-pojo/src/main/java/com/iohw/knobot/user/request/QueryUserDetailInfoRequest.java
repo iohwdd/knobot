@@ -4,11 +4,10 @@ import lombok.Data;
 
 /**
  * @author: iohw
- * @date: 2025/5/7 23:18
+ * @date: 2025/5/8 11:32
  * @description:
  */
 @Data
-public class SendEmailRequest {
+public class QueryUserDetailInfoRequest {
     private Long userId;
-    private String to;
 }

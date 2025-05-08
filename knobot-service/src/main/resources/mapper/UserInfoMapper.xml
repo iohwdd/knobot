@@ -10,21 +10,23 @@
         <result column="password" property="password"/>
         <result column="email" property="email"/>
         <result column="nickname" property="nickname"/>
+        <result column="description" property="description"/>
         <result column="avatar_url" property="avatarUrl"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        user_id, username, password, email, nickname, avatar_url, create_time, update_time
+        user_id, username, password, email, nickname, description, avatar_url, create_time, update_time
     </sql>
 
     <insert id="insert" parameterType="com.iohw.knobot.user.model.UserInfoDO" useGeneratedKeys="true" keyProperty="userId">
-        INSERT INTO user_info (user_id, username, password, email, nickname, avatar_url)
-        VALUES (#{record.userId}, #{record.username}, #{record.password}, #{record.email}, #{record.nickname}, #{record.avatarUrl})
+        INSERT INTO user_info (user_id, username, password, email, nickname, description, avatar_url)
+        VALUES (#{record.userId}, #{record.username}, #{record.password}, #{record.email},
+                #{record.nickname}, #{record.description}, #{record.avatarUrl})
     </insert>
 
-    <select id="selectById" resultMap="BaseResultMap">
+    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
         FROM user_info
@@ -51,12 +53,13 @@
             <if test="record.password != null">password = #{record.password},</if>
             <if test="record.email != null">email = #{record.email},</if>
             <if test="record.nickname != null">nickname = #{record.nickname},</if>
+            <if test="record.description != null">description = #{record.description},</if>
             <if test="record.avatarUrl != null">avatar_url = #{record.avatarUrl},</if>
         </set>
         WHERE user_id = #{record.userId}
     </update>
 
-    <delete id="deleteById">
+    <delete id="deleteById" parameterType="java.lang.Long">
         DELETE FROM user_info
         WHERE user_id = #{userId}
     </delete>

@@ -26,4 +26,8 @@ public class FileUtils {
             file.delete();
         }
     }
+
+    public static String getTypeByFileName(String fileName) {
+        return fileName.substring(fileName.lastIndexOf(".") + 1);
+    }
 }

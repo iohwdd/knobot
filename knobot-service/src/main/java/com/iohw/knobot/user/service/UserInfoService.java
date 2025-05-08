@@ -2,9 +2,8 @@ package com.iohw.knobot.user.service;
 
 import com.iohw.knobot.user.model.UserInfoDO;
 import com.iohw.knobot.user.model.dto.UserInfoDto;
-import com.iohw.knobot.user.request.LoginRequest;
-import com.iohw.knobot.user.request.ModifyUserInfoRequest;
-import com.iohw.knobot.user.request.RegistryRequest;
+import com.iohw.knobot.user.model.vo.UserDetailInfoVO;
+import com.iohw.knobot.user.request.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -47,9 +46,8 @@ public interface UserInfoService {
     /**
      * 更新用户信息
      * @param modifyUserInfoRequest 用户信息
-     * @return 是否成功
      */
-    boolean updateUserInfo(ModifyUserInfoRequest modifyUserInfoRequest);
+    void updateUserInfo(ModifyUserInfoRequest modifyUserInfoRequest);
 
     /**
      * 删除用户
@@ -71,4 +69,23 @@ public interface UserInfoService {
     UserInfoDto login(HttpServletRequest req, HttpServletResponse resp, LoginRequest request);
 
     void logout(HttpServletResponse resp, HttpServletRequest req);
+
+    /**
+     * 查询用户详情信息
+     * @param request
+     * @return
+     */
+    UserDetailInfoVO queryUserDetailInfo(QueryUserDetailInfoRequest request);
+
+    /**
+     * 绑定/换绑 邮箱
+     * @param bindEmailRequest
+     */
+    void bindEmail(BindEmailRequest bindEmailRequest);
+
+    /**
+     * 发送邮箱验证码
+     * @param sendEmailRequest
+     */
+    void sendEmail(SendEmailRequest sendEmailRequest);
 }

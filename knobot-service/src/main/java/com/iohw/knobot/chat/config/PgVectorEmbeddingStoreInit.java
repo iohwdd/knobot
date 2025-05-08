@@ -15,17 +15,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class PgVectorEmbeddingStoreInit {
-    final PgConfig pgConfig;
+    final PgVectorProperties pgVectorProperties;
 
     @Bean
     EmbeddingStore<TextSegment> initEmbeddingStore() {
         return PgVectorEmbeddingStore.builder()
-                .host(pgConfig.getHost())
-                .port(pgConfig.getPort())
-                .user(pgConfig.getUser())
-                .password(pgConfig.getPassword())
-                .database(pgConfig.getDatabase())
-                .table(pgConfig.getTable())
+                .host(pgVectorProperties.getHost())
+                .port(pgVectorProperties.getPort())
+                .user(pgVectorProperties.getUser())
+                .password(pgVectorProperties.getPassword())
+                .database(pgVectorProperties.getDatabase())
+                .table(pgVectorProperties.getTable())
                 .dimension(1024)
                 .dropTableFirst(false)
                 .createTable(true)

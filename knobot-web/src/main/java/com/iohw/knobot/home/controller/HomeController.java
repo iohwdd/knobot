@@ -7,6 +7,7 @@ import com.iohw.knobot.common.response.Result;
 import com.iohw.knobot.coze.model.WeatherData;
 import com.iohw.knobot.coze.request.DayWhetherRequest;
 import com.iohw.knobot.home.serivce.CozeService;
+import com.iohw.knobot.utils.EmailUtil;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.service.AiServices;
 import lombok.RequiredArgsConstructor;
@@ -26,17 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/home")
 @RequiredArgsConstructor
 public class HomeController {
-    private final ChatLanguageModel model;
-    private final SendEmailTool sendEmailTool;
     private final CozeService cozeService;
+    private final EmailUtil emailUtil;
 
-    @PostMapping("/submit-issue")
+    @PostMapping("/submitIssue")
     public Result<Void> submitIssue(@RequestBody SubmitIssueCommand issue) {
-        EmailAssistant emailAssistant = AiServices.builder(EmailAssistant.class)
-                .chatLanguageModel(model)
-                .tools(sendEmailTool)
-                .build();
-        emailAssistant.sendEmailToAuthor(issue.getIssueDescription());
+        emailUtil.sendFeedbackEmail(issue.getTitle(), issue.getIssueDescription());
         return Result.success(null);
     }
 

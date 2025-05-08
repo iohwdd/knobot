@@ -12,7 +12,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  * @description: Web应用启动类
  */
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.iohw.knobot.*",})
+@ComponentScan(basePackages = {"com.iohw.knobot.**",})
 @MapperScan(basePackages = {"com.iohw.knobot.*.mapper",})
 public class KnobotWebApplication {
 

@@ -37,7 +37,7 @@ public class OssUtil {
         OSS ossClient = new OSSClientBuilder().build(properties.getEndpoint(), properties.getAccessKeyId(), properties.getSecretAccessKeyId());
         String name = path + "/" + fileName;
         PutObjectRequest putObjectRequest = new PutObjectRequest(properties.getBucketName(), name, in);
-        String url = "https://" + properties.getBucketName() + "." + properties.getEndpoint() + "/" + fileName;
+        String url = "https://" + properties.getBucketName() + "." + properties.getEndpoint().replace("http://", "").replace("https://", "") + "/" + name;
         ossClient.putObject(putObjectRequest);
         return url;
     }

@@ -1,21 +1,23 @@
 package com.iohw.knobot.user.controller;
 
-import com.iohw.knobot.chat.tool.SendEmailTool;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.iohw.knobot.common.response.Result;
 import com.iohw.knobot.user.model.dto.UserInfoDto;
-import com.iohw.knobot.user.request.LoginRequest;
-import com.iohw.knobot.user.request.ModifyUserInfoRequest;
-import com.iohw.knobot.user.request.RegistryRequest;
-import com.iohw.knobot.user.request.SendEmailRequest;
+import com.iohw.knobot.user.request.*;
 import com.iohw.knobot.user.service.UserInfoService;
 import com.iohw.knobot.utils.EmailUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author: iohw
@@ -26,8 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
-    private final EmailUtil emailUtil;
+
     private final UserInfoService userInfoService;
+
 
     @PostMapping("/login")
     public Result<UserInfoDto> login(HttpServletRequest req, HttpServletResponse resp, @RequestBody LoginRequest request) {
@@ -52,15 +55,20 @@ public class UserController {
 
     @PostMapping("/sendEmail")
     public Result<Void> sendEmail(@RequestBody SendEmailRequest sendEmailRequest) {
-        emailUtil.sendCodeVerifyEmail(sendEmailRequest.getTo(), sendEmailRequest.getEmail());
+
+        userInfoService.sendEmail(sendEmailRequest);
         return Result.success();
     }
 
-    @PostMapping("/modifyInfo")
-    public Result<Void> modify(@RequestBody ModifyUserInfoRequest modifyUserInfoRequest) {
-        if(userInfoService.updateUserInfo(modifyUserInfoRequest)) {
-            return Result.success("更新成功");
-        }
-        return Result.error("更新失败");
+    @PostMapping(value = "/modifyInfo")
+    public Result<Void> modify(ModifyUserInfoRequest modifyUserInfoRequest) {
+        userInfoService.updateUserInfo(modifyUserInfoRequest);
+        return Result.success();
+    }
+
+    @PostMapping("/bindEmail")
+    public Result<Void> bindEmail(@RequestBody BindEmailRequest bindEmailRequest) {
+        userInfoService.bindEmail(bindEmailRequest);
+        return Result.success();
     }
 }

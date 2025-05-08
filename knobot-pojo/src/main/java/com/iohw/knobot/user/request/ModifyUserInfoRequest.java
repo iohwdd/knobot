@@ -1,6 +1,7 @@
 package com.iohw.knobot.user.request;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author: iohw
@@ -12,6 +13,6 @@ public class ModifyUserInfoRequest {
     private Long userId;
     private String newPassword;
     private String nickname;
-    private String avatarUrl;
     private String description;
+    private MultipartFile avatar;
 }

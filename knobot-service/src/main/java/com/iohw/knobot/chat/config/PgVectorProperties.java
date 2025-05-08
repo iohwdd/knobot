@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "pgvector")
 @Data
-public class PgConfig {
+public class PgVectorProperties {
 
     private String host;
 

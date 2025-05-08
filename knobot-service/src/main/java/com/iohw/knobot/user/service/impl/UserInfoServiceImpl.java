@@ -1,6 +1,8 @@
 package com.iohw.knobot.user.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.iohw.knobot.common.ReqContext;
 import com.iohw.knobot.common.constant.Constants;
 import com.iohw.knobot.common.exception.BusinessException;
@@ -8,12 +10,10 @@ import com.iohw.knobot.user.model.UserInfoDO;
 import com.iohw.knobot.user.mapper.UserInfoMapper;
 import com.iohw.knobot.user.model.convert.UserInfoConverter;
 import com.iohw.knobot.user.model.dto.UserInfoDto;
-import com.iohw.knobot.user.request.LoginRequest;
-import com.iohw.knobot.user.request.ModifyUserInfoRequest;
-import com.iohw.knobot.user.request.RegistryRequest;
+import com.iohw.knobot.user.model.vo.UserDetailInfoVO;
+import com.iohw.knobot.user.request.*;
 import com.iohw.knobot.user.service.UserInfoService;
-import com.iohw.knobot.utils.IdGeneratorUtil;
-import com.iohw.knobot.utils.ThreadLocalUtils;
+import com.iohw.knobot.utils.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,7 +23,11 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -39,9 +43,13 @@ import static com.iohw.knobot.common.constant.Constants.REQ_CONTEXT;
 public class UserInfoServiceImpl implements UserInfoService {
     private final UserInfoMapper userInfoMapper;
     private final StringRedisTemplate stringRedisTemplate;
+    private final EmailUtil emailUtil;
+    private final Cache<Object, Object> emailCodeCache = Caffeine.newBuilder()
+            .maximumSize(100)
+            .expireAfterWrite(60, TimeUnit.SECONDS)
+            .build();
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Long createUser(RegistryRequest registryRequest) {
         UserInfoDO user = getUserByUsername(registryRequest.getUsername());
         if(user != null) {
@@ -51,7 +59,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         userInfoDO.setUsername(registryRequest.getUsername());
         userInfoDO.setPassword(registryRequest.getPassword());
         userInfoDO.setUserId(IdUtil.getSnowflake().nextId());
-
+        userInfoDO.setNickname(NicknameGenerator.generateNickname());
         userInfoMapper.insert(userInfoDO);
         return userInfoDO.getUserId();
     }
@@ -63,7 +71,6 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public UserInfoDO getUserByUsername(String username) {
-
         return userInfoMapper.selectByUsername(username);
     }
 
@@ -73,19 +80,33 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public boolean updateUserInfo(ModifyUserInfoRequest modifyUserInfoRequest) {
+    public void updateUserInfo(ModifyUserInfoRequest modifyUserInfoRequest) {
         UserInfoDO userInfo = new UserInfoDO();
         userInfo.setUserId(modifyUserInfoRequest.getUserId());
+
+        MultipartFile avatarFile = modifyUserInfoRequest.getAvatar();
+        if(avatarFile != null) {
+            try {
+                //上传图片到oss
+                String originalFilename = avatarFile.getOriginalFilename();
+                String type = FileUtils.getTypeByFileName(originalFilename);
+                // - 统一为 {userId}.png
+                String avatarFileName = modifyUserInfoRequest.getUserId() + "." + type;
+                String avatarUrl = OssUtil.upload("avatar", avatarFileName, avatarFile.getInputStream());
+                userInfo.setAvatarUrl(avatarUrl);
+            } catch (IOException e) {
+                throw new BusinessException("图片文件异常");
+            }
+        }
+
+
         userInfo.setPassword(modifyUserInfoRequest.getNewPassword());
         userInfo.setNickname(modifyUserInfoRequest.getNickname());
-        userInfo.setAvatarUrl(modifyUserInfoRequest.getAvatarUrl());
-
-        return userInfoMapper.updateById(userInfo) > 0;
+        userInfo.setDescription(modifyUserInfoRequest.getDescription());
+        userInfoMapper.updateById(userInfo);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public boolean deleteUser(Long id) {
         return userInfoMapper.deleteById(id) > 0;
     }
@@ -160,5 +181,44 @@ public class UserInfoServiceImpl implements UserInfoService {
         cookie.setMaxAge(0);
         cookie.setPath("/");
         resp.addCookie(cookie);
+    }
+
+    @Override
+    public UserDetailInfoVO queryUserDetailInfo(QueryUserDetailInfoRequest request) {
+        UserInfoDO userInfoDO = userInfoMapper.selectById(request.getUserId());
+        if(userInfoDO == null) {
+            throw new BusinessException("不存在该用户");
+        }
+        long joinDays = Duration.between(userInfoDO.getCreateTime(), LocalDateTime.now()).toDays();
+        return UserDetailInfoVO.builder()
+                .nickName(userInfoDO.getNickname())
+                .description(userInfoDO.getDescription())
+                .avatarUrl(userInfoDO.getAvatarUrl())
+                .joinDays(joinDays)
+                .username(userInfoDO.getUsername())
+                .email(userInfoDO.getEmail())
+                .build();
+    }
+
+    @Override
+    public void bindEmail(BindEmailRequest bindEmailRequest) {
+        String emailCode = (String)emailCodeCache.getIfPresent(bindEmailRequest.getUserId());
+        if(emailCode == null || !emailCode.equals(bindEmailRequest.getCode())) {
+            throw new BusinessException("邮箱验证码错误或已过期，请重试~");
+        }
+        UserInfoDO userInfoDO = new UserInfoDO();
+        userInfoDO.setUserId(bindEmailRequest.getUserId());
+        // 绑定邮箱
+        userInfoDO.setEmail(bindEmailRequest.getNewEmail());
+        userInfoMapper.updateById(userInfoDO);
+    }
+
+    @Override
+    public void sendEmail(SendEmailRequest sendEmailRequest) {
+        // 1. 缓存验证码
+        String code = new Random().nextInt(900000) + 100000 + "";
+        emailCodeCache.put(sendEmailRequest.getUserId(), code);
+        // 2. 发送验证码邮件
+        emailUtil.sendCodeVerifyEmail(sendEmailRequest.getTo(), code);
     }
 }

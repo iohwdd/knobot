@@ -35,7 +35,10 @@ public class UserInfoDO {
      * 昵称
      */
     private String nickname;
-
+    /**
+     * 个性签名
+     */
+    private String description;
     /**
      * 头像URL
      */

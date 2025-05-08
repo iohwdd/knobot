@@ -1,6 +1,6 @@
 package com.iohw.knobot.chat.tool;
 
-import com.iohw.knobot.chat.config.EmailConfig;
+import com.iohw.knobot.config.properties.EmailProperties;
 import com.iohw.knobot.chat.exception.EmailSendException;
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.agent.tool.P;
@@ -25,7 +25,7 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 public class SendEmailTool {
     private final JavaMailSenderImpl javaMailSender;
-    private final EmailConfig emailConfig;
+    private final EmailProperties emailProperties;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Tool("将用户提的建议、问题、Bug信息发送邮件给作者")
@@ -40,13 +40,13 @@ public class SendEmailTool {
             helper.setSubject("问题反馈：" + title);
 
             String content = String.format(
-                emailConfig.getTemplate(),
+                emailProperties.getTemplate(),
                 LocalDateTime.now().format(FORMATTER),
                 issueDescription
             );
             helper.setText(content, true);
-            helper.setTo(emailConfig.getToAddress());
-            helper.setFrom(emailConfig.getFromAddress());
+            helper.setTo(emailProperties.getToAddress());
+            helper.setFrom(emailProperties.getFromAddress());
 
             javaMailSender.send(message);
             log.info("问题反馈邮件发送成功");
