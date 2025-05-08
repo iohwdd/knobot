@@ -17,4 +17,11 @@
 
 # 页面效果展示
 整个项目还在开发过程中，功能尚未完善，存在许多问题，期待大家指正，更期待参与fork贡献😊
-![image](https://github.com/user-attachments/assets/7624e920-7b4b-4380-a0f8-289289814720)
+![image](https://github.com/user-attachments/assets/938dd639-7588-4e07-9e2b-d8192c80d28a)
+
+![image](https://github.com/user-attachments/assets/f2889211-19d1-4e1d-af5e-ec557f96033d)
+
+![image](https://github.com/user-attachments/assets/bfab6b1c-f6a3-4124-832d-c9f1420438ee)
+
+![image](https://github.com/user-attachments/assets/c0c508ba-2f0d-441f-a863-818bf9606d1b)
+
