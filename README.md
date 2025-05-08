@@ -11,14 +11,17 @@
 
 4. mysql初始化：脚本位于`knobot-service/src/main/resources/init.sql`
 
-5. oss对象存储：创建好Bucket与密钥对`https://ram.console.aliyun.com/profile/access-keys?spm=5176.7933691.nav-v2-dropdown-my-aliyun.5.29852c47zR5EjH` ,配置好`application-oss.yml`
+5. oss对象存储：创建好Bucket与密钥对 https://ram.console.aliyun.com/profile/access-keys?spm=5176.7933691.nav-v2-dropdown-my-aliyun.5.29852c47zR5EjH ,配置好`application-oss.yml`
 
-
-**tips：**
-如果想使用其它LLM大模型，自己去配置，并在AiConfig配置类中解开注释↓  
-![image](https://github.com/user-attachments/assets/6e161767-d9db-40fd-aedb-071b9bd45b54)
-![image](https://github.com/user-attachments/assets/6c99dcc1-9646-42f0-9856-a3bdef5b7977)
+6. 前端启动：代码在 https://github.com/iohwdd/knobot_frontend ，依次执行`npm install` `npm run dev` 即可
 
 # 页面效果展示
 整个项目还在开发过程中，功能尚未完善，存在许多问题，期待大家指正，更期待参与fork贡献😊
-![image](https://github.com/user-attachments/assets/7624e920-7b4b-4380-a0f8-289289814720)
+![image](https://github.com/user-attachments/assets/938dd639-7588-4e07-9e2b-d8192c80d28a)
+
+![image](https://github.com/user-attachments/assets/f2889211-19d1-4e1d-af5e-ec557f96033d)
+
+![image](https://github.com/user-attachments/assets/bfab6b1c-f6a3-4124-832d-c9f1420438ee)
+
+![image](https://github.com/user-attachments/assets/c0c508ba-2f0d-441f-a863-818bf9606d1b)
+
