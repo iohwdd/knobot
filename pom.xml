@@ -6,7 +6,6 @@
     <modules>
         <module>knobot-service</module>
         <module>knobot-core</module>
-        <module>knobot-pojo</module>
         <module>knobot-web</module>
     </modules>
     <parent>
