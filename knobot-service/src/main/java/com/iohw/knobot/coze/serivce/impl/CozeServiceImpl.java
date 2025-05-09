@@ -1,0 +1,31 @@
+package com.iohw.knobot.coze.serivce.impl;
+
+import com.alibaba.fastjson.JSONObject;
+import com.iohw.knobot.coze.domain.vo.request.CozeWorkFlowRequest;
+import com.iohw.knobot.coze.domain.vo.response.CozeWorkFlowResponse;
+import com.iohw.knobot.chat.domain.dto.WeatherDataDTO;
+import com.iohw.knobot.chat.domain.vo.request.DayWhetherRequest;
+import com.iohw.knobot.coze.serivce.CozeService;
+import com.iohw.knobot.coze.CozeClient;
+import org.springframework.stereotype.Service;
+
+/**
+ * @author: iohw
+ * @date: 2025/4/29 23:22
+ * @description:
+ */
+@Service
+public class CozeServiceImpl implements CozeService {
+    @Override
+    public WeatherDataDTO getWeatherData(DayWhetherRequest request) {
+        CozeWorkFlowRequest<DayWhetherRequest> workFlowRequest = new CozeWorkFlowRequest<>();
+        workFlowRequest.setWorkflow_id("7498737967733751858");
+        workFlowRequest.setParameters(request);
+
+        CozeWorkFlowResponse workFlowResponse = CozeClient.reqWorkFlow(workFlowRequest);
+        JSONObject jsonObject = JSONObject.parseObject(workFlowResponse.getData());
+        WeatherDataDTO data = JSONObject.parseObject(jsonObject.getString("data"), WeatherDataDTO.class);
+
+        return data;
+    }
+}

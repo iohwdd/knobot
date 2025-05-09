@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iohw.knobot.chat.mapper.ChatConversationMapper">
 
-    <resultMap id="BaseResultMap" type="com.iohw.knobot.chat.model.ChatConversationDO">
+    <resultMap id="BaseResultMap" type="com.iohw.knobot.chat.domain.entity.ChatConversationDO">
         <id column="id" property="id"/>
         <result column="memory_id" property="memoryId"/>
         <result column="user_id" property="userId"/>
@@ -16,7 +16,7 @@
         id, memory_id, user_id, title, status, create_time, update_time
     </sql>
 
-    <insert id="insert" parameterType="com.iohw.knobot.chat.model.ChatConversationDO">
+    <insert id="insert" parameterType="com.iohw.knobot.chat.domain.entity.ChatConversationDO">
         INSERT INTO chat_conversation (memory_id, user_id, title)
         VALUES (#{memoryId}, #{userId}, #{title})
     </insert>

@@ -1,23 +1,22 @@
 package com.iohw.knobot.chat.controller;
 
-import com.iohw.knobot.chat.assistant.AssistantService;
-import com.iohw.knobot.chat.assistant.IAssistant.StreamingAssistant;
-import com.iohw.knobot.chat.assistant.IAssistant.SummarizeAssistant;
-import com.iohw.knobot.chat.assistant.IAssistant.WebSearchAssistant;
-import com.iohw.knobot.chat.model.dto.ChatSessionDto;
-import com.iohw.knobot.chat.model.dto.ChatMessageDto;
-import com.iohw.knobot.chat.request.ChatRequest;
-import com.iohw.knobot.chat.request.command.CreateConversationCommand;
-import com.iohw.knobot.chat.request.command.DeleteConversationCommand;
-import com.iohw.knobot.chat.request.command.UpdateConversationTitleCommand;
-import com.iohw.knobot.chat.vo.FileUploadVO;
+import com.iohw.knobot.chat.ai.assistant.AssistantService;
+import com.iohw.knobot.chat.ai.assistant.IAssistant.StreamingAssistant;
+import com.iohw.knobot.chat.ai.assistant.IAssistant.SummarizeAssistant;
+import com.iohw.knobot.chat.ai.assistant.IAssistant.WebSearchAssistant;
+import com.iohw.knobot.chat.domain.vo.response.ChatSessionResponse;
+import com.iohw.knobot.chat.domain.vo.response.ChatMessageResponse;
+import com.iohw.knobot.chat.domain.vo.request.ChatRequest;
+import com.iohw.knobot.chat.domain.vo.request.CreateConversationCommand;
+import com.iohw.knobot.chat.domain.vo.request.DeleteConversationCommand;
+import com.iohw.knobot.chat.domain.vo.request.UpdateConversationTitleCommand;
+import com.iohw.knobot.chat.domain.vo.response.FileUploadResponse;
 import com.iohw.knobot.chat.service.ChatService;
-import com.iohw.knobot.chat.service.SessionSideBarService;
-import com.iohw.knobot.chat.vo.ChatSessionVO;
+import com.iohw.knobot.chat.service.ConversationSideBarService;
+import com.iohw.knobot.chat.domain.vo.response.ChatConversionItemResponse;
 import com.iohw.knobot.common.annotation.MdcDot;
-import com.iohw.knobot.common.dto.FileUploadDto;
-import com.iohw.knobot.common.response.Result;
-import com.iohw.knobot.upload.FileUploadFactory;
+import com.iohw.knobot.upload.dto.FileUploadDTO;
+import com.iohw.knobot.common.Result;
 import com.iohw.knobot.upload.LocalUploadFileStrategy;
 import com.iohw.knobot.upload.UploadFileStrategy;
 import com.iohw.knobot.utils.FileUtils;
@@ -52,7 +51,7 @@ import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.load
 @RequestMapping("/chat")
 @RequiredArgsConstructor
 public class ChatController {
-    private final SessionSideBarService sessionSideBarService;
+    private final ConversationSideBarService conversationSideBarService;
     private final ChatService chatService;
     private final WebSearchAssistant webSearchAssistant;
     private final EmbeddingStoreIngestor ingestor;
@@ -62,17 +61,17 @@ public class ChatController {
     private static final Map<String, String> filePathMap = new HashMap<>();
 
     @PostMapping("/upload")
-    public Result<FileUploadVO> uploadFile(@RequestParam("file") MultipartFile file) {
+    public Result<FileUploadResponse> uploadFile(@RequestParam("file") MultipartFile file) {
         UploadFileStrategy uploadStrategy = new LocalUploadFileStrategy();
-        FileUploadDto uploadDto = uploadStrategy.upload(file, "/tmp");
+        FileUploadDTO uploadDto = uploadStrategy.upload(file, "/tmp");
 
-        FileUploadVO fileUploadVO = FileUploadVO.builder()
+        FileUploadResponse fileUploadResponse = FileUploadResponse.builder()
                 .fileId(uploadDto.getFileId())
                 .fileName(uploadDto.getFileName())
                 .filePath(uploadDto.getFilePath())
                 .build();
         filePathMap.put(uploadDto.getFileId(), uploadDto.getFilePath());
-        return Result.success(fileUploadVO);
+        return Result.success(fileUploadResponse);
     }
 
     @MdcDot
@@ -86,7 +85,7 @@ public class ChatController {
         if (isFirstQuestion) {
             log.info("用户 {} 在会话 {} 中首次提问", request.getUserId(), memoryId);
             String newTitle = summarizeAssistant.summarize(request.getUserMessage());
-            sessionSideBarService.updateChatConversationTitle(
+            conversationSideBarService.updateChatConversationTitle(
                     UpdateConversationTitleCommand.builder()
                             .memoryId(memoryId)
                             .newTitle(newTitle)
@@ -147,27 +146,27 @@ public class ChatController {
     }
 
     @GetMapping("/conversation-history")
-    public Result<List<ChatSessionDto>> queryChatConversationHistory(Long userId) {
-        return sessionSideBarService.queryChatConversation(userId);
+    public Result<List<ChatSessionResponse>> queryChatConversationHistory(Long userId) {
+        return conversationSideBarService.queryChatConversation(userId);
     }
 
     @PostMapping("/conversation-create")
-    public Result<ChatSessionVO> createChatConversation(@RequestBody CreateConversationCommand command) {
-        return sessionSideBarService.createChatConversation(command);
+    public Result<ChatConversionItemResponse> createChatConversation(@RequestBody CreateConversationCommand command) {
+        return conversationSideBarService.createChatConversation(command);
     }
 
     @PostMapping("/conversation-delete")
     public Result<Void> deleteChatConversation(@RequestBody DeleteConversationCommand command) {
-        return sessionSideBarService.deleteChatConversation(command);
+        return conversationSideBarService.deleteChatConversation(command);
     }
 
     @PostMapping("/conversation-title-update")
     public Result<Void> updateChatConversationTitle(@RequestBody UpdateConversationTitleCommand command) {
-        return sessionSideBarService.updateChatConversationTitle(command);
+        return conversationSideBarService.updateChatConversationTitle(command);
     }
 
     @GetMapping("/messages")
-    public Result<List<ChatMessageDto>> queryHistoryMessages(String memoryId) {
+    public Result<List<ChatMessageResponse>> queryHistoryMessages(String memoryId) {
         return chatService.queryHistoryMessages(memoryId);
     }
 }

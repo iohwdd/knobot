@@ -1,10 +1,10 @@
 package com.iohw.knobot.libary.service;
 
-import com.iohw.knobot.library.model.KnowledgeLibDocumentDO;
-import com.iohw.knobot.library.model.vo.KnowledgeLibDocumentVO;
-import com.iohw.knobot.library.request.CreateKnowledgeLibDocCommand;
-import com.iohw.knobot.library.request.DeleteKnowledgeLibDocCommand;
-import com.iohw.knobot.library.request.UpdateKnowledgeLibDocCommand;
+import com.iohw.knobot.libary.domain.entity.KnowledgeLibDocumentDO;
+import com.iohw.knobot.libary.domain.vo.request.CreateKnowledgeLibDocCommand;
+import com.iohw.knobot.libary.domain.vo.request.DeleteKnowledgeLibDocCommand;
+import com.iohw.knobot.libary.domain.vo.request.UpdateKnowledgeLibDocCommand;
+import com.iohw.knobot.libary.domain.vo.response.KnowledgeLibDocumentResponse;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public interface KnowledgeLibDocumentService {
     /**
      * 获取知识库下的所有文档
      */
-    List<KnowledgeLibDocumentVO> queryDocumentList(String knowledgeLibId);
+    List<KnowledgeLibDocumentResponse> queryDocumentList(String knowledgeLibId);
 
     /**
      * 更新文档信息

@@ -1,8 +1,8 @@
 package com.iohw.knobot.user.controller;
 
-import com.iohw.knobot.common.response.Result;
-import com.iohw.knobot.user.model.vo.UserDetailInfoVO;
-import com.iohw.knobot.user.request.QueryUserDetailInfoRequest;
+import com.iohw.knobot.common.Result;
+import com.iohw.knobot.user.domain.vo.response.UserDetailInfoResp;
+import com.iohw.knobot.user.domain.vo.request.QueryUserDetailInfoRequest;
 import com.iohw.knobot.user.service.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,8 +22,8 @@ public class UserQueryController {
     private final UserInfoService userInfoService;
 
     @PostMapping("/queryUserDetailInfo")
-    public Result<UserDetailInfoVO> queryUserDetailInfo(@RequestBody QueryUserDetailInfoRequest request) {
-        UserDetailInfoVO userDetailInfoVO = userInfoService.queryUserDetailInfo(request);
-        return Result.success(userDetailInfoVO);
+    public Result<UserDetailInfoResp> queryUserDetailInfo(@RequestBody QueryUserDetailInfoRequest request) {
+        UserDetailInfoResp userDetailInfoResp = userInfoService.queryUserDetailInfo(request);
+        return Result.success(userDetailInfoResp);
     }
 }

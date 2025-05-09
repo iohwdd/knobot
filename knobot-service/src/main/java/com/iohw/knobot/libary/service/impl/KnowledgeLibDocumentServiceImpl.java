@@ -1,23 +1,21 @@
 package com.iohw.knobot.libary.service.impl;
 
-import com.iohw.knobot.common.dto.FileUploadDto;
-import com.iohw.knobot.library.model.KnowledgeLibDocumentDO;
+import com.iohw.knobot.upload.dto.FileUploadDTO;
+import com.iohw.knobot.libary.domain.convert.KnowledgeLibDocumentConvert;
+import com.iohw.knobot.libary.domain.entity.KnowledgeLibDocumentDO;
+import com.iohw.knobot.libary.domain.vo.request.CreateKnowledgeLibDocCommand;
+import com.iohw.knobot.libary.domain.vo.request.DeleteKnowledgeLibDocCommand;
+import com.iohw.knobot.libary.domain.vo.request.UpdateKnowledgeLibDocCommand;
 import com.iohw.knobot.libary.mapper.KnowledgeLibDocumentMapper;
 import com.iohw.knobot.libary.service.KnowledgeLibDocumentService;
 import com.iohw.knobot.libary.service.KnowledgeLibService;
-import com.iohw.knobot.library.model.convert.KnowledgeLibDocumentConvert;
-import com.iohw.knobot.library.model.vo.KnowledgeLibDocumentVO;
-import com.iohw.knobot.library.request.CreateKnowledgeLibDocCommand;
-import com.iohw.knobot.library.request.DeleteKnowledgeLibDocCommand;
-import com.iohw.knobot.library.request.UpdateKnowledgeLibDocCommand;
+import com.iohw.knobot.libary.domain.vo.response.KnowledgeLibDocumentResponse;
 import com.iohw.knobot.upload.FileUploadFactory;
 import com.iohw.knobot.upload.LocalUploadFileStrategy;
-import com.iohw.knobot.upload.UploadFileStrategy;
 import com.iohw.knobot.utils.FileUtils;
 import com.iohw.knobot.utils.IdGeneratorUtil;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentParser;
-import dev.langchain4j.data.document.parser.TextDocumentParser;
 import dev.langchain4j.data.document.parser.apache.tika.ApacheTikaDocumentParser;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +39,7 @@ public class KnowledgeLibDocumentServiceImpl implements KnowledgeLibDocumentServ
     private final KnowledgeLibService knowledgeLibService;
     private final EmbeddingStoreIngestor ingestor;
     private final FileUploadFactory fileUploadFactory;
+    private final KnowledgeLibDocumentConvert documentConvert;
 
     @Override
     public void addDocument(CreateKnowledgeLibDocCommand command) {
@@ -49,11 +48,11 @@ public class KnowledgeLibDocumentServiceImpl implements KnowledgeLibDocumentServ
         documentDO.setDocumentDesc(command.getDocumentDesc());
         documentDO.setDocumentId(IdGeneratorUtil.generateDocId());
         documentDO.setKnowledgeLibId(command.getKnowledgeLibId());
-        FileUploadDto upload = fileUploadFactory.getUploadStrategy().upload(command.getFile(), "doc");
+        FileUploadDTO upload = fileUploadFactory.getUploadStrategy().upload(command.getFile(), "doc");
 
         //todo 上传到本地，导入向量数据库后删除 - 向量数据库加载貌似必须从本地文件中导入，后面看看有没有解决方法
         LocalUploadFileStrategy fileStrategy = new LocalUploadFileStrategy();
-        FileUploadDto dto = fileStrategy.upload(command.getFile(), "/tmp");
+        FileUploadDTO dto = fileStrategy.upload(command.getFile(), "/tmp");
 
         documentDO.setPath(upload.getFilePath());
         documentDO.setDocumentSize(FileUtils.getFileSizeInMB(command.getFile()));
@@ -91,8 +90,8 @@ public class KnowledgeLibDocumentServiceImpl implements KnowledgeLibDocumentServ
     }
 
     @Override
-    public List<KnowledgeLibDocumentVO> queryDocumentList(String knowledgeLibId) {
-        return KnowledgeLibDocumentConvert.INSTANCE.toVO(documentMapper.selectListByKnowledgeLibId(knowledgeLibId));
+    public List<KnowledgeLibDocumentResponse> queryDocumentList(String knowledgeLibId) {
+        return documentConvert.toVO(documentMapper.selectListByKnowledgeLibId(knowledgeLibId));
     }
 
     @Override
@@ -102,7 +101,7 @@ public class KnowledgeLibDocumentServiceImpl implements KnowledgeLibDocumentServ
         documentDO.setDocumentDesc(command.getDocumentDesc());
         documentDO.setDocumentId(command.getDocumentId());
         if(command.getFile() != null) {
-            FileUploadDto upload = fileUploadFactory.getUploadStrategy().upload(command.getFile(), "doc");
+            FileUploadDTO upload = fileUploadFactory.getUploadStrategy().upload(command.getFile(), "doc");
             documentDO.setPath(upload.getFilePath());
             documentDO.setDocumentSize(FileUtils.getFileSizeInMB(command.getFile()));
         }

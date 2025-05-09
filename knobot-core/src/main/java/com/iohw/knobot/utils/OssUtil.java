@@ -6,15 +6,6 @@ import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.PutObjectResult;
 import com.iohw.knobot.config.properties.ConfigHolder;
 import com.iohw.knobot.config.properties.OssProperties;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 /**
@@ -25,7 +16,6 @@ import java.io.InputStream;
 
 public class OssUtil {
     private static final OssProperties properties = ConfigHolder.ossProperties;
-
     /**
      *
      * @param path

@@ -1,7 +1,7 @@
 package com.iohw.knobot.hook.interceptor;
 
 import com.iohw.knobot.common.ReqContext;
-import com.iohw.knobot.user.model.UserInfoDO;
+import com.iohw.knobot.user.domain.entity.UserInfoDO;
 import com.iohw.knobot.user.service.UserInfoService;
 import com.iohw.knobot.utils.ThreadLocalUtils;
 import jakarta.servlet.http.Cookie;

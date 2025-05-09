@@ -4,7 +4,7 @@
 
 <mapper namespace="com.iohw.knobot.user.mapper.UserInfoMapper">
 
-    <resultMap id="BaseResultMap" type="com.iohw.knobot.user.model.UserInfoDO">
+    <resultMap id="BaseResultMap" type="com.iohw.knobot.user.domain.entity.UserInfoDO">
         <id column="user_id" property="userId"/>
         <result column="username" property="username"/>
         <result column="password" property="password"/>
@@ -20,7 +20,7 @@
         user_id, username, password, email, nickname, description, avatar_url, create_time, update_time
     </sql>
 
-    <insert id="insert" parameterType="com.iohw.knobot.user.model.UserInfoDO" useGeneratedKeys="true" keyProperty="userId">
+    <insert id="insert" parameterType="com.iohw.knobot.user.domain.entity.UserInfoDO" useGeneratedKeys="true" keyProperty="userId">
         INSERT INTO user_info (user_id, username, password, email, nickname, description, avatar_url)
         VALUES (#{record.userId}, #{record.username}, #{record.password}, #{record.email},
                 #{record.nickname}, #{record.description}, #{record.avatarUrl})
@@ -47,7 +47,7 @@
         WHERE email = #{email}
     </select>
 
-    <update id="updateById" parameterType="com.iohw.knobot.user.model.UserInfoDO">
+    <update id="updateById" parameterType="com.iohw.knobot.user.domain.entity.UserInfoDO">
         UPDATE user_info
         <set>
             <if test="record.password != null">password = #{record.password},</if>

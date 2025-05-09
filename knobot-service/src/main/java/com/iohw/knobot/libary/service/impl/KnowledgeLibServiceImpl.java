@@ -1,17 +1,20 @@
 package com.iohw.knobot.libary.service.impl;
 
+import com.iohw.knobot.libary.domain.convert.KnowledgeLibConvert;
+import com.iohw.knobot.libary.domain.entity.KnowledgeLibDO;
+import com.iohw.knobot.libary.domain.vo.request.CreateKnowledgeLibCommand;
+import com.iohw.knobot.libary.domain.vo.request.DeleteKnowledgeLibCommand;
+import com.iohw.knobot.libary.domain.vo.request.QueryLibraryDetailListRequest;
+import com.iohw.knobot.libary.domain.vo.request.QueryLibraryListRequest;
+import com.iohw.knobot.libary.domain.vo.request.UpdateKnowledgeLibCommand;
 import com.iohw.knobot.libary.mapper.KnowledgeLibDocumentMapper;
-import com.iohw.knobot.library.model.KnowledgeLibDO;
 import com.iohw.knobot.libary.mapper.KnowledgeLibMapper;
 import com.iohw.knobot.libary.service.KnowledgeLibService;
-import com.iohw.knobot.library.model.convert.KnowledgeLibConvert;
-import com.iohw.knobot.library.model.vo.KnowledgeLibNameVO;
-import com.iohw.knobot.library.model.vo.KnowledgeLibVO;
-import com.iohw.knobot.library.request.*;
+import com.iohw.knobot.libary.domain.vo.response.KnowledgeLibNameResponse;
+import com.iohw.knobot.libary.domain.vo.response.KnowledgeLibResponse;
 import com.iohw.knobot.utils.IdGeneratorUtil;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.store.embedding.EmbeddingStore;
-import dev.langchain4j.store.embedding.filter.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +32,7 @@ import static dev.langchain4j.store.embedding.filter.MetadataFilterBuilder.metad
 public class KnowledgeLibServiceImpl implements KnowledgeLibService {
     private final KnowledgeLibDocumentMapper documentMapper;
     private final KnowledgeLibMapper knowledgeLibMapper;
+    private final KnowledgeLibConvert knowledgeLibConvert;
 
     @Override
     public void createKnowledgeLib(CreateKnowledgeLibCommand command) {
@@ -47,10 +51,10 @@ public class KnowledgeLibServiceImpl implements KnowledgeLibService {
     }
 
     @Override
-    public List<KnowledgeLibVO> queryLibraryDetailList(QueryLibraryDetailListRequest request) {
+    public List<KnowledgeLibResponse> queryLibraryDetailList(QueryLibraryDetailListRequest request) {
         List<KnowledgeLibDO> knowledgeLibDOS = knowledgeLibMapper.selectByUserId(request.getUserId());
         if(knowledgeLibDOS.isEmpty()) return null;
-        return KnowledgeLibConvert.INSTANCE.toVOList(knowledgeLibDOS);
+        return knowledgeLibConvert.toVOList(knowledgeLibDOS);
     }
 
     @Override
@@ -79,10 +83,10 @@ public class KnowledgeLibServiceImpl implements KnowledgeLibService {
     }
 
     @Override
-    public List<KnowledgeLibNameVO> queryKnowledgeLibList(QueryLibraryListRequest request) {
+    public List<KnowledgeLibNameResponse> queryKnowledgeLibList(QueryLibraryListRequest request) {
         List<KnowledgeLibDO> list = knowledgeLibMapper.selectByUserId(request.getUserId());
         return list.stream()
-                .map(item -> KnowledgeLibNameVO.builder()
+                .map(item -> KnowledgeLibNameResponse.builder()
                         .knowledgeLibName(item.getKnowledgeLibName())
                         .knowledgeLibId(item.getKnowledgeLibId())
                         .build())

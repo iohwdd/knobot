@@ -1,15 +1,18 @@
 package com.iohw.knobot.chat.service.impl;
 
-import com.iohw.knobot.chat.model.convert.ChatMessageConverter;
-import com.iohw.knobot.chat.model.ChatMessageDO;
-import com.iohw.knobot.chat.model.dto.ChatMessageDto;
+import com.iohw.knobot.chat.domain.convert.ChatConversationConverter;
+import com.iohw.knobot.chat.domain.convert.ChatMessageConverter;
+import com.iohw.knobot.chat.domain.entity.ChatMessageDO;
+import com.iohw.knobot.chat.domain.vo.response.ChatMessageResponse;
 import com.iohw.knobot.chat.mapper.ChatMessageMapper;
 import com.iohw.knobot.chat.service.ChatService;
-import com.iohw.knobot.common.response.Result;
+import com.iohw.knobot.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author: iohw
@@ -17,14 +20,15 @@ import java.util.List;
  * @description:
  */
 @Service
+@RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService {
-    @Autowired
-    private ChatMessageMapper chatMessageMapper;
+    private final ChatMessageMapper chatMessageMapper;
+    private final ChatMessageConverter chatMessageConverter;
 
     @Override
-    public Result<List<ChatMessageDto>> queryHistoryMessages(String memoryId) {
+    public Result<List<ChatMessageResponse>> queryHistoryMessages(String memoryId) {
         List<ChatMessageDO> chatMessageDOS = chatMessageMapper.selectByMemoryId(memoryId);
-        return Result.success(ChatMessageConverter.INSTANCE.toDtoList(chatMessageDOS));
+        return Result.success(chatMessageConverter.toDtoList(chatMessageDOS));
     }
 
     @Override

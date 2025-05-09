@@ -4,25 +4,27 @@ import cn.hutool.core.util.IdUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.iohw.knobot.common.ReqContext;
-import com.iohw.knobot.common.constant.Constants;
 import com.iohw.knobot.common.exception.BusinessException;
-import com.iohw.knobot.user.model.UserInfoDO;
+import com.iohw.knobot.user.domain.entity.UserInfoDO;
+import com.iohw.knobot.user.domain.vo.request.BindEmailCommand;
+import com.iohw.knobot.user.domain.vo.request.LoginCommand;
+import com.iohw.knobot.user.domain.vo.request.ModifyUserInfoCommand;
+import com.iohw.knobot.user.domain.vo.request.QueryUserDetailInfoRequest;
+import com.iohw.knobot.user.domain.vo.request.RegistryCommand;
+import com.iohw.knobot.user.domain.vo.request.SendEmailCommand;
 import com.iohw.knobot.user.mapper.UserInfoMapper;
-import com.iohw.knobot.user.model.convert.UserInfoConverter;
-import com.iohw.knobot.user.model.dto.UserInfoDto;
-import com.iohw.knobot.user.model.vo.UserDetailInfoVO;
-import com.iohw.knobot.user.request.*;
+import com.iohw.knobot.user.domain.convert.UserInfoConverter;
+import com.iohw.knobot.user.domain.vo.response.UserInfoResponse;
+import com.iohw.knobot.user.domain.vo.response.UserDetailInfoResp;
 import com.iohw.knobot.user.service.UserInfoService;
 import com.iohw.knobot.utils.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -44,20 +46,21 @@ public class UserInfoServiceImpl implements UserInfoService {
     private final UserInfoMapper userInfoMapper;
     private final StringRedisTemplate stringRedisTemplate;
     private final EmailUtil emailUtil;
+    private final UserInfoConverter userInfoConverter;
     private final Cache<Object, Object> emailCodeCache = Caffeine.newBuilder()
             .maximumSize(100)
             .expireAfterWrite(60, TimeUnit.SECONDS)
             .build();
 
     @Override
-    public Long createUser(RegistryRequest registryRequest) {
-        UserInfoDO user = getUserByUsername(registryRequest.getUsername());
+    public Long createUser(RegistryCommand registryCommand) {
+        UserInfoDO user = getUserByUsername(registryCommand.getUsername());
         if(user != null) {
             throw new BusinessException("用户名已存在");
         }
         UserInfoDO userInfoDO = new UserInfoDO();
-        userInfoDO.setUsername(registryRequest.getUsername());
-        userInfoDO.setPassword(registryRequest.getPassword());
+        userInfoDO.setUsername(registryCommand.getUsername());
+        userInfoDO.setPassword(registryCommand.getPassword());
         userInfoDO.setUserId(IdUtil.getSnowflake().nextId());
         userInfoDO.setNickname(NicknameGenerator.generateNickname());
         userInfoMapper.insert(userInfoDO);
@@ -80,18 +83,18 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public void updateUserInfo(ModifyUserInfoRequest modifyUserInfoRequest) {
+    public void updateUserInfo(ModifyUserInfoCommand modifyUserInfoCommand) {
         UserInfoDO userInfo = new UserInfoDO();
-        userInfo.setUserId(modifyUserInfoRequest.getUserId());
+        userInfo.setUserId(modifyUserInfoCommand.getUserId());
 
-        MultipartFile avatarFile = modifyUserInfoRequest.getAvatar();
+        MultipartFile avatarFile = modifyUserInfoCommand.getAvatar();
         if(avatarFile != null) {
             try {
                 //上传图片到oss
                 String originalFilename = avatarFile.getOriginalFilename();
                 String type = FileUtils.getTypeByFileName(originalFilename);
                 // - 统一为 {userId}.png
-                String avatarFileName = modifyUserInfoRequest.getUserId() + "." + type;
+                String avatarFileName = modifyUserInfoCommand.getUserId() + "." + type;
                 String avatarUrl = OssUtil.upload("avatar", avatarFileName, avatarFile.getInputStream());
                 userInfo.setAvatarUrl(avatarUrl);
             } catch (IOException e) {
@@ -100,9 +103,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
 
 
-        userInfo.setPassword(modifyUserInfoRequest.getNewPassword());
-        userInfo.setNickname(modifyUserInfoRequest.getNickname());
-        userInfo.setDescription(modifyUserInfoRequest.getDescription());
+        userInfo.setPassword(modifyUserInfoCommand.getNewPassword());
+        userInfo.setNickname(modifyUserInfoCommand.getNickname());
+        userInfo.setDescription(modifyUserInfoCommand.getDescription());
         userInfoMapper.updateById(userInfo);
     }
 
@@ -117,7 +120,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public UserInfoDto login(HttpServletRequest req, HttpServletResponse resp, LoginRequest request) {
+    public UserInfoResponse login(HttpServletRequest req, HttpServletResponse resp, LoginCommand request) {
         UserInfoDO user = userInfoMapper.selectByUsername(request.getUsername());
         // 用户不存在或密码错误
         if (user == null || !request.getPassword().equals(user.getPassword())) {
@@ -154,7 +157,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 .build();
         ThreadLocalUtils.set(REQ_CONTEXT, reqContext);
 
-        UserInfoDto dto = UserInfoConverter.INSTANCE.toDto(user);
+        UserInfoResponse dto = userInfoConverter.toDto(user);
 
         // 响应添加cookie
         Cookie cookie = new Cookie(TOKEN, token);
@@ -184,13 +187,13 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public UserDetailInfoVO queryUserDetailInfo(QueryUserDetailInfoRequest request) {
+    public UserDetailInfoResp queryUserDetailInfo(QueryUserDetailInfoRequest request) {
         UserInfoDO userInfoDO = userInfoMapper.selectById(request.getUserId());
         if(userInfoDO == null) {
             throw new BusinessException("不存在该用户");
         }
         long joinDays = Duration.between(userInfoDO.getCreateTime(), LocalDateTime.now()).toDays();
-        return UserDetailInfoVO.builder()
+        return UserDetailInfoResp.builder()
                 .nickName(userInfoDO.getNickname())
                 .description(userInfoDO.getDescription())
                 .avatarUrl(userInfoDO.getAvatarUrl())
@@ -201,24 +204,24 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public void bindEmail(BindEmailRequest bindEmailRequest) {
-        String emailCode = (String)emailCodeCache.getIfPresent(bindEmailRequest.getUserId());
-        if(emailCode == null || !emailCode.equals(bindEmailRequest.getCode())) {
+    public void bindEmail(BindEmailCommand bindEmailCommand) {
+        String emailCode = (String)emailCodeCache.getIfPresent(bindEmailCommand.getUserId());
+        if(emailCode == null || !emailCode.equals(bindEmailCommand.getCode())) {
             throw new BusinessException("邮箱验证码错误或已过期，请重试~");
         }
         UserInfoDO userInfoDO = new UserInfoDO();
-        userInfoDO.setUserId(bindEmailRequest.getUserId());
+        userInfoDO.setUserId(bindEmailCommand.getUserId());
         // 绑定邮箱
-        userInfoDO.setEmail(bindEmailRequest.getNewEmail());
+        userInfoDO.setEmail(bindEmailCommand.getNewEmail());
         userInfoMapper.updateById(userInfoDO);
     }
 
     @Override
-    public void sendEmail(SendEmailRequest sendEmailRequest) {
+    public void sendEmail(SendEmailCommand sendEmailCommand) {
         // 1. 缓存验证码
         String code = new Random().nextInt(900000) + 100000 + "";
-        emailCodeCache.put(sendEmailRequest.getUserId(), code);
+        emailCodeCache.put(sendEmailCommand.getUserId(), code);
         // 2. 发送验证码邮件
-        emailUtil.sendCodeVerifyEmail(sendEmailRequest.getTo(), code);
+        emailUtil.sendCodeVerifyEmail(sendEmailCommand.getTo(), code);
     }
 }

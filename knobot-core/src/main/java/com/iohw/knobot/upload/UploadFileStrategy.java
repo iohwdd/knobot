@@ -1,6 +1,6 @@
 package com.iohw.knobot.upload;
 
-import com.iohw.knobot.common.dto.FileUploadDto;
+import com.iohw.knobot.upload.dto.FileUploadDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -9,5 +9,5 @@ import org.springframework.web.multipart.MultipartFile;
  * @description:
  */
 public interface UploadFileStrategy {
-    FileUploadDto upload(MultipartFile file, String path);
+    FileUploadDTO upload(MultipartFile file, String path);
 }

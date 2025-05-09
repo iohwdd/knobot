@@ -1,23 +1,22 @@
 package com.iohw.knobot.user.controller;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.iohw.knobot.common.response.Result;
-import com.iohw.knobot.user.model.dto.UserInfoDto;
-import com.iohw.knobot.user.request.*;
+import com.iohw.knobot.common.Result;
+import com.iohw.knobot.user.domain.vo.request.BindEmailCommand;
+import com.iohw.knobot.user.domain.vo.request.LoginCommand;
+import com.iohw.knobot.user.domain.vo.request.ModifyUserInfoCommand;
+import com.iohw.knobot.user.domain.vo.request.RegistryCommand;
+import com.iohw.knobot.user.domain.vo.request.SendEmailCommand;
+import com.iohw.knobot.user.domain.vo.response.UserInfoResponse;
 import com.iohw.knobot.user.service.UserInfoService;
-import com.iohw.knobot.utils.EmailUtil;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author: iohw
@@ -33,12 +32,13 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public Result<UserInfoDto> login(HttpServletRequest req, HttpServletResponse resp, @RequestBody LoginRequest request) {
-        UserInfoDto userInfoDto = userInfoService.login(req, resp, request);
-        if(userInfoDto == null) {
+    public Result<UserInfoResponse> login(HttpServletRequest req, HttpServletResponse resp, @RequestBody
+    LoginCommand request) {
+        UserInfoResponse userInfoResponse = userInfoService.login(req, resp, request);
+        if(userInfoResponse == null) {
             return Result.error("账号或密码错误");
         }
-        return Result.success(userInfoDto);
+        return Result.success(userInfoResponse);
     }
 
     @PostMapping("/logout")
@@ -48,27 +48,27 @@ public class UserController {
     }
 
     @PostMapping("/registry")
-    public Result<Void> registry(@RequestBody RegistryRequest request) {
+    public Result<Void> registry(@RequestBody RegistryCommand request) {
         userInfoService.createUser(request);
         return Result.success("注册成功");
     }
 
     @PostMapping("/sendEmail")
-    public Result<Void> sendEmail(@RequestBody SendEmailRequest sendEmailRequest) {
+    public Result<Void> sendEmail(@RequestBody SendEmailCommand sendEmailCommand) {
 
-        userInfoService.sendEmail(sendEmailRequest);
+        userInfoService.sendEmail(sendEmailCommand);
         return Result.success();
     }
 
     @PostMapping(value = "/modifyInfo")
-    public Result<Void> modify(ModifyUserInfoRequest modifyUserInfoRequest) {
-        userInfoService.updateUserInfo(modifyUserInfoRequest);
+    public Result<Void> modify(ModifyUserInfoCommand modifyUserInfoCommand) {
+        userInfoService.updateUserInfo(modifyUserInfoCommand);
         return Result.success();
     }
 
     @PostMapping("/bindEmail")
-    public Result<Void> bindEmail(@RequestBody BindEmailRequest bindEmailRequest) {
-        userInfoService.bindEmail(bindEmailRequest);
+    public Result<Void> bindEmail(@RequestBody BindEmailCommand bindEmailCommand) {
+        userInfoService.bindEmail(bindEmailCommand);
         return Result.success();
     }
 }

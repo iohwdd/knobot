@@ -1,9 +1,15 @@
 package com.iohw.knobot.user.service;
 
-import com.iohw.knobot.user.model.UserInfoDO;
-import com.iohw.knobot.user.model.dto.UserInfoDto;
-import com.iohw.knobot.user.model.vo.UserDetailInfoVO;
-import com.iohw.knobot.user.request.*;
+import com.iohw.knobot.user.domain.entity.UserInfoDO;
+import com.iohw.knobot.user.domain.vo.request.BindEmailCommand;
+import com.iohw.knobot.user.domain.vo.request.LoginCommand;
+import com.iohw.knobot.user.domain.vo.request.ModifyUserInfoCommand;
+import com.iohw.knobot.user.domain.vo.request.QueryUserDetailInfoRequest;
+import com.iohw.knobot.user.domain.vo.request.RegistryCommand;
+import com.iohw.knobot.user.domain.vo.request.SendEmailCommand;
+import com.iohw.knobot.user.domain.vo.response.UserInfoResponse;
+import com.iohw.knobot.user.domain.vo.response.UserDetailInfoResp;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -20,7 +26,7 @@ public interface UserInfoService {
      * 创建用户
      * @return 用户ID
      */
-    Long createUser(RegistryRequest registryRequest);
+    Long createUser(RegistryCommand registryCommand);
 
     /**
      * 根据ID获取用户信息
@@ -45,9 +51,9 @@ public interface UserInfoService {
 
     /**
      * 更新用户信息
-     * @param modifyUserInfoRequest 用户信息
+     * @param modifyUserInfoCommand 用户信息
      */
-    void updateUserInfo(ModifyUserInfoRequest modifyUserInfoRequest);
+    void updateUserInfo(ModifyUserInfoCommand modifyUserInfoCommand);
 
     /**
      * 删除用户
@@ -66,7 +72,7 @@ public interface UserInfoService {
      * 用户登录
      * @return 用户信息，登录失败返回null
      */
-    UserInfoDto login(HttpServletRequest req, HttpServletResponse resp, LoginRequest request);
+    UserInfoResponse login(HttpServletRequest req, HttpServletResponse resp, LoginCommand request);
 
     void logout(HttpServletResponse resp, HttpServletRequest req);
 
@@ -75,17 +81,17 @@ public interface UserInfoService {
      * @param request
      * @return
      */
-    UserDetailInfoVO queryUserDetailInfo(QueryUserDetailInfoRequest request);
+    UserDetailInfoResp queryUserDetailInfo(QueryUserDetailInfoRequest request);
 
     /**
      * 绑定/换绑 邮箱
-     * @param bindEmailRequest
+     * @param bindEmailCommand
      */
-    void bindEmail(BindEmailRequest bindEmailRequest);
+    void bindEmail(BindEmailCommand bindEmailCommand);
 
     /**
      * 发送邮箱验证码
-     * @param sendEmailRequest
+     * @param sendEmailCommand
      */
-    void sendEmail(SendEmailRequest sendEmailRequest);
+    void sendEmail(SendEmailCommand sendEmailCommand);
 }

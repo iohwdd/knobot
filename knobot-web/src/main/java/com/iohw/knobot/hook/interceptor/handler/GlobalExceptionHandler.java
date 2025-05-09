@@ -1,6 +1,6 @@
 package com.iohw.knobot.hook.interceptor.handler;
 
-import com.iohw.knobot.common.response.Result;
+import com.iohw.knobot.common.Result;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 

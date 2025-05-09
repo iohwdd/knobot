@@ -1,9 +1,14 @@
 package com.iohw.knobot.library.controller;
 
+import com.iohw.knobot.libary.domain.vo.request.CreateKnowledgeLibCommand;
+import com.iohw.knobot.libary.domain.vo.request.CreateKnowledgeLibDocCommand;
+import com.iohw.knobot.libary.domain.vo.request.DeleteKnowledgeLibCommand;
+import com.iohw.knobot.libary.domain.vo.request.DeleteKnowledgeLibDocCommand;
+import com.iohw.knobot.libary.domain.vo.request.UpdateKnowledgeLibCommand;
+import com.iohw.knobot.libary.domain.vo.request.UpdateKnowledgeLibDocCommand;
 import com.iohw.knobot.libary.service.KnowledgeLibDocumentService;
 import com.iohw.knobot.libary.service.KnowledgeLibService;
-import com.iohw.knobot.library.request.*;
-import com.iohw.knobot.common.response.Result;
+import com.iohw.knobot.common.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

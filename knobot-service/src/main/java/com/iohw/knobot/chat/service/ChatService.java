@@ -1,7 +1,7 @@
 package com.iohw.knobot.chat.service;
 
-import com.iohw.knobot.chat.model.dto.ChatMessageDto;
-import com.iohw.knobot.common.response.Result;
+import com.iohw.knobot.chat.domain.vo.response.ChatMessageResponse;
+import com.iohw.knobot.common.Result;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * @description:
  */
 public interface ChatService {
-    Result<List<ChatMessageDto>> queryHistoryMessages(String memoryId);
+    Result<List<ChatMessageResponse>> queryHistoryMessages(String memoryId);
 
     /**
      * 判断是否是用户在该会话中的第一次提问

@@ -1,5 +1,5 @@
 oss:
   endpoint: https://oss-cn-hangzhou.aliyuncs.com
-  accessKeyId:
-  secretAccessKeyId:
+  accessKeyId: ${OSS_ACCESS_KEY}
+  secretAccessKeyId: ${OSS_SERCET_ACCESS_KEY}
   bucketName: knobot

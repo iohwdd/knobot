@@ -4,11 +4,11 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password:
+    password: ${MYSQL_PASSWORD}
     url: jdbc:mysql://localhost:3306/knobot?useUnicode=true&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&characterSetResults=utf8mb4&connectionCollation=utf8mb4_unicode_ci
   mail:
-    username:
-    password:
+    username: 3979892804@qq.com
+    password: ${EMAIL_PASSWORD}
     host: smtp.qq.com
     port: 587
     default-encoding: UTF-8
@@ -26,11 +26,11 @@ spring:
         debug: false
   data:
     redis:
-      host:
+      host: ${SERVER_IP}
       port: 6379
       database: 15
   config:
-    import: application-ai.yml
+    import: application-ai.yml, application-oss.yml
 
 server:
   port: 8080
@@ -40,15 +40,27 @@ mybatis:
   mapper-locations: classpath:mapper/*.xml
   configuration:
     map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 
 
+# 邮件参数配置
 mail:
-  from-address:
-  to-address:
+  from-address: 3979892804@qq.com # 发送邮件的机器人
+  to-address: 2023321332@qq.com # 作者邮件地址 - 接收用户反馈信息
+  template: |
+    <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+      <p><strong>问题反馈时间：</strong>%s</p>
+
+      <p><strong>问题描述：</strong></p>
+      <p>%s</p>
+
+      <hr style="border: none; border-top: 1px solid #ccc; margin: 20px 0;">
+      <p style="color: #666; font-size: 12px;">此邮件由系统自动发送，请勿直接回复。</p>
+    </div>
 
 # 文件上传方式
 upload:
-  way: local
+  way: oss # -local 本地上传 -oss 阿里云对象存储
 
 # 日志地址
 log:

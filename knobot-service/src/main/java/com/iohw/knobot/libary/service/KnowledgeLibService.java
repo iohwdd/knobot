@@ -1,9 +1,13 @@
 package com.iohw.knobot.libary.service;
 
-import com.iohw.knobot.library.model.KnowledgeLibDO;
-import com.iohw.knobot.library.model.vo.KnowledgeLibNameVO;
-import com.iohw.knobot.library.model.vo.KnowledgeLibVO;
-import com.iohw.knobot.library.request.*;
+import com.iohw.knobot.libary.domain.entity.KnowledgeLibDO;
+import com.iohw.knobot.libary.domain.vo.request.CreateKnowledgeLibCommand;
+import com.iohw.knobot.libary.domain.vo.request.DeleteKnowledgeLibCommand;
+import com.iohw.knobot.libary.domain.vo.request.QueryLibraryDetailListRequest;
+import com.iohw.knobot.libary.domain.vo.request.QueryLibraryListRequest;
+import com.iohw.knobot.libary.domain.vo.request.UpdateKnowledgeLibCommand;
+import com.iohw.knobot.libary.domain.vo.response.KnowledgeLibNameResponse;
+import com.iohw.knobot.libary.domain.vo.response.KnowledgeLibResponse;
 
 import java.util.List;
 
@@ -26,7 +30,7 @@ public interface KnowledgeLibService {
     /**
      * 获取所有知识库列表
      */
-    List<KnowledgeLibVO> queryLibraryDetailList(QueryLibraryDetailListRequest request);
+    List<KnowledgeLibResponse> queryLibraryDetailList(QueryLibraryDetailListRequest request);
 
     /**
      * 更新知识库信息
@@ -43,5 +47,5 @@ public interface KnowledgeLibService {
      */
     void deleteKnowledgeLib(DeleteKnowledgeLibCommand command);
 
-    List<KnowledgeLibNameVO> queryKnowledgeLibList(QueryLibraryListRequest request);
+    List<KnowledgeLibNameResponse> queryKnowledgeLibList(QueryLibraryListRequest request);
 }

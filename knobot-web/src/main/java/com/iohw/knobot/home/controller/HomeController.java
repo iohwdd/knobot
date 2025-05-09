@@ -1,15 +1,12 @@
 package com.iohw.knobot.home.controller;
 
-import com.iohw.knobot.chat.assistant.IAssistant.EmailAssistant;
-import com.iohw.knobot.chat.request.command.SubmitIssueCommand;
-import com.iohw.knobot.chat.tool.SendEmailTool;
-import com.iohw.knobot.common.response.Result;
-import com.iohw.knobot.coze.model.WeatherData;
-import com.iohw.knobot.coze.request.DayWhetherRequest;
-import com.iohw.knobot.home.serivce.CozeService;
+import com.iohw.knobot.chat.domain.vo.request.SubmitIssueCommand;
+import com.iohw.knobot.common.Result;
+import com.iohw.knobot.chat.domain.dto.WeatherDataDTO;
+import com.iohw.knobot.chat.domain.vo.request.DayWhetherRequest;
+import com.iohw.knobot.coze.serivce.CozeService;
 import com.iohw.knobot.utils.EmailUtil;
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.service.AiServices;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,7 +34,7 @@ public class HomeController {
     }
 
     @PostMapping("/getWeather")
-    public Result<WeatherData> getWeather(@RequestBody DayWhetherRequest request) {
+    public Result<WeatherDataDTO> getWeather(@RequestBody DayWhetherRequest request) {
         return Result.success(cozeService.getWeatherData(request));
     }
 }

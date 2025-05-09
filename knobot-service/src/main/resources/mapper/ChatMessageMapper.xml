@@ -4,7 +4,7 @@
 
 <mapper namespace="com.iohw.knobot.chat.mapper.ChatMessageMapper">
 
-    <resultMap id="BaseResultMap" type="com.iohw.knobot.chat.model.ChatMessageDO">
+    <resultMap id="BaseResultMap" type="com.iohw.knobot.chat.domain.entity.ChatMessageDO">
         <id column="id" property="id"/>
         <result column="message_id" property="messageId"/>
         <result column="memory_id" property="memoryId"/>

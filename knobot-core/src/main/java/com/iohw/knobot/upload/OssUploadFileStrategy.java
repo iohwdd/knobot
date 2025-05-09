@@ -1,6 +1,6 @@
 package com.iohw.knobot.upload;
 
-import com.iohw.knobot.common.dto.FileUploadDto;
+import com.iohw.knobot.upload.dto.FileUploadDTO;
 import com.iohw.knobot.common.exception.FileUploadException;
 import com.iohw.knobot.utils.OssUtil;
 import org.springframework.stereotype.Component;
@@ -18,13 +18,13 @@ import java.util.UUID;
 @Component
 public class OssUploadFileStrategy implements UploadFileStrategy {
     @Override
-    public FileUploadDto upload(MultipartFile file, String path) {
+    public FileUploadDTO upload(MultipartFile file, String path) {
         try {
             //String name = file.getOriginalFilename();
             String name = UUID.randomUUID().toString();
             InputStream in = file.getInputStream();
             String url = OssUtil.upload(path, name, in);
-            return FileUploadDto.builder()
+            return FileUploadDTO.builder()
                     .fileId(String.valueOf(System.currentTimeMillis()))
                     .fileName(name)
                     .filePath(path)

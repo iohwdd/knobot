@@ -1,9 +1,10 @@
 package com.iohw.knobot.libary.mapper;
 
-import com.iohw.knobot.library.model.KnowledgeLibDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
+
+import com.iohw.knobot.libary.domain.entity.KnowledgeLibDO;
 
 /**
  * @author: iohw

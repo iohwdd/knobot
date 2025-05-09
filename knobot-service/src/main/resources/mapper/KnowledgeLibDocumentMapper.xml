@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iohw.knobot.libary.mapper.KnowledgeLibDocumentMapper">
 
-    <resultMap id="BaseResultMap" type="com.iohw.knobot.library.model.KnowledgeLibDocumentDO">
+    <resultMap id="BaseResultMap" type="com.iohw.knobot.libary.domain.entity.KnowledgeLibDocumentDO">
         <id column="document_id" property="documentId"/>
         <id column="knowledge_lib_id" property="knowledgeLibId"/>
         <result column="document_name" property="documentName"/>
@@ -17,7 +17,7 @@
         document_id, knowledge_lib_id, document_name, document_desc, document_size, url, path, upload_time
     </sql>
 
-    <insert id="insert" parameterType="com.iohw.knobot.library.model.KnowledgeLibDocumentDO">
+    <insert id="insert" parameterType="com.iohw.knobot.libary.domain.entity.KnowledgeLibDocumentDO">
         INSERT INTO knowledge_lib_document (
             document_id, knowledge_lib_id, document_name, document_desc, document_size, url, path
         ) VALUES (
@@ -51,7 +51,7 @@
         ORDER BY upload_time DESC
     </select>
 
-    <update id="update" parameterType="com.iohw.knobot.library.model.KnowledgeLibDocumentDO">
+    <update id="update" parameterType="com.iohw.knobot.libary.domain.entity.KnowledgeLibDocumentDO">
         UPDATE knowledge_lib_document
         <set>
             <if test="documentName != null">

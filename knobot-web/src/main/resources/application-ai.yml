@@ -22,19 +22,19 @@ langchain4j:
 # Embedding model - PgVector
 pgvector:
   database: vecdb
-  host:
+  host: ${SERVER_IP}
   port: 5432
   user: postgres
-  password:
+  password: postgres
   table: vectors_db
 
 # search engine
 search:
   engine: google
-  api-key:
+  api-key: ${SEARCH_ENGINE_API}
 
 # personal LLM
 llm:
-  apikey:
+  apikey: ${DEEPSEEK_API_KEY}
   model: deepseek-reasoner
   baseUrl: https://api.deepseek.com

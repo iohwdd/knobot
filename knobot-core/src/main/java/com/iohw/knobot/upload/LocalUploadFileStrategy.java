@@ -1,8 +1,7 @@
 package com.iohw.knobot.upload;
 
-import com.iohw.knobot.common.dto.FileUploadDto;
+import com.iohw.knobot.upload.dto.FileUploadDTO;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -22,7 +21,7 @@ public class LocalUploadFileStrategy implements UploadFileStrategy {
     private String baseDir = "./files";
 
     @Override
-    public FileUploadDto upload(MultipartFile file, String path) {
+    public FileUploadDTO upload(MultipartFile file, String path) {
         try {
             Path uploadPath = Paths.get(baseDir + path);
             if(!Files.exists(uploadPath)) {
@@ -34,7 +33,7 @@ public class LocalUploadFileStrategy implements UploadFileStrategy {
             Path filePath = uploadPath.resolve(fileName);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            return FileUploadDto.builder()
+            return FileUploadDTO.builder()
                     .fileName(fileName)
                     .filePath(String.valueOf(filePath))
                     .fileId(String.valueOf(System.currentTimeMillis()))

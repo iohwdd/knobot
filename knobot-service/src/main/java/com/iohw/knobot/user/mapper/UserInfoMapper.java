@@ -1,6 +1,6 @@
 package com.iohw.knobot.user.mapper;
 
-import com.iohw.knobot.user.model.UserInfoDO;
+import com.iohw.knobot.user.domain.entity.UserInfoDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
