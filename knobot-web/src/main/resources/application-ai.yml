@@ -19,6 +19,7 @@ langchain4j:
         model-name: text-embedding-v3
         dimensions: 1024
 
+
 # Embedding model - PgVector
 pgvector:
   database: vecdb

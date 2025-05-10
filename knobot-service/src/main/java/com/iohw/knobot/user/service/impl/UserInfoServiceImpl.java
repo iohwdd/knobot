@@ -129,15 +129,17 @@ public class UserInfoServiceImpl implements UserInfoService {
 
         // 删除旧token
         Cookie[] cookies = req.getCookies();
-        for (Cookie cookie : cookies) {
-            if(cookie.getName().equals(TOKEN)) {
-                stringRedisTemplate.delete(cookie.getValue());
-                // 删除旧cookie
-                Cookie del = new Cookie(cookie.getName(), null);
-                del.setMaxAge(0);
-                del.setPath("/");
-                resp.addCookie(del);
-                break;
+        if(cookies != null) {
+            for (Cookie cookie : cookies) {
+                if(cookie.getName().equals(TOKEN)) {
+                    stringRedisTemplate.delete(cookie.getValue());
+                    // 删除旧cookie
+                    Cookie del = new Cookie(cookie.getName(), null);
+                    del.setMaxAge(0);
+                    del.setPath("/");
+                    resp.addCookie(del);
+                    break;
+                }
             }
         }
 

@@ -4,7 +4,11 @@ import com.iohw.knobot.common.Result;
 import com.iohw.knobot.user.domain.vo.response.UserDetailInfoResp;
 import com.iohw.knobot.user.domain.vo.request.QueryUserDetailInfoRequest;
 import com.iohw.knobot.user.service.UserInfoService;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +26,7 @@ public class UserQueryController {
     private final UserInfoService userInfoService;
 
     @PostMapping("/queryUserDetailInfo")
-    public Result<UserDetailInfoResp> queryUserDetailInfo(@RequestBody QueryUserDetailInfoRequest request) {
+    public Result<UserDetailInfoResp> queryUserDetailInfo(@Validated @RequestBody QueryUserDetailInfoRequest request) {
         UserDetailInfoResp userDetailInfoResp = userInfoService.queryUserDetailInfo(request);
         return Result.success(userDetailInfoResp);
     }

@@ -1,5 +1,6 @@
 package com.iohw.knobot.chat.controller;
 
+import com.alibaba.dashscope.aigc.multimodalconversation.MultiModalConversation;
 import com.iohw.knobot.chat.ai.assistant.AssistantService;
 import com.iohw.knobot.chat.ai.assistant.IAssistant.StreamingAssistant;
 import com.iohw.knobot.chat.ai.assistant.IAssistant.SummarizeAssistant;
@@ -53,97 +54,19 @@ import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.load
 public class ChatController {
     private final ConversationSideBarService conversationSideBarService;
     private final ChatService chatService;
-    private final WebSearchAssistant webSearchAssistant;
-    private final EmbeddingStoreIngestor ingestor;
-    private final AssistantService assistantService;
-    private final SummarizeAssistant summarizeAssistant;
 
-    private static final Map<String, String> filePathMap = new HashMap<>();
 
     @PostMapping("/upload")
-    public Result<FileUploadResponse> uploadFile(@RequestParam("file") MultipartFile file) {
-        UploadFileStrategy uploadStrategy = new LocalUploadFileStrategy();
-        FileUploadDTO uploadDto = uploadStrategy.upload(file, "/tmp");
-
-        FileUploadResponse fileUploadResponse = FileUploadResponse.builder()
-                .fileId(uploadDto.getFileId())
-                .fileName(uploadDto.getFileName())
-                .filePath(uploadDto.getFilePath())
-                .build();
-        filePathMap.put(uploadDto.getFileId(), uploadDto.getFilePath());
-        return Result.success(fileUploadResponse);
+    public Result<FileUploadResponse> uploadFile4Chat(@RequestParam("file") MultipartFile file) {
+        return Result.success(chatService.uploadFile4Chat(file));
     }
 
     @MdcDot
     @GetMapping(value = "/{memoryId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chat(@PathVariable String memoryId, ChatRequest request) {
-        SseEmitter emitter = new SseEmitter(-1L); // 无超时
-        String fileId = request.getFileId();
-
-        // 判断是否是首次提问 - 更新标题
-        boolean isFirstQuestion = chatService.isFirstQuestion(memoryId);
-        if (isFirstQuestion) {
-            log.info("用户 {} 在会话 {} 中首次提问", request.getUserId(), memoryId);
-            String newTitle = summarizeAssistant.summarize(request.getUserMessage());
-            conversationSideBarService.updateChatConversationTitle(
-                    UpdateConversationTitleCommand.builder()
-                            .memoryId(memoryId)
-                            .newTitle(newTitle)
-                            .build()
-            );
-        }
-
-        //上传了附件
-        if(!StringUtils.isEmpty(fileId)) {
-            String filePath = filePathMap.get(fileId);
-            loadFile2Store(filePath);
-        }
-
-        try {
-            StreamingAssistant assistant = assistantService.getRagAssistant(memoryId, request.getKnowledgeLibId());
-            // 开启联网搜索
-            if(request.getIsWebSearchRequest()) {
-                assistant = webSearchAssistant;
-            }
-            TokenStream tokenStream = assistant.chat(memoryId, request.getUserMessage());
-            tokenStream
-                    .onPartialResponse(token -> {
-                        try {
-                            emitter.send(SseEmitter.event()
-                                    .data(token)
-                                    .id(String.valueOf(System.currentTimeMillis()))
-                                    .name("message"));
-                        } catch (Exception e) {
-                            emitter.completeWithError(e);
-                        }
-                    })
-                    .onCompleteResponse(response -> {
-                        try {
-                            emitter.send(SseEmitter.event()
-                                    .data("[DONE]")
-                                    .id("done")
-                                    .name("done"));
-                            emitter.complete();
-                        } catch (Exception e) {
-                            emitter.completeWithError(e);
-                        }
-                    })
-                    .onError(e -> emitter.completeWithError(e))
-                    .start();
-        } catch (Exception e) {
-            emitter.completeWithError(e);
-        }
-        return emitter;
+        return chatService.chat(memoryId, request);
     }
 
-    private void loadFile2Store(String filePath) {
-        Path path = Paths.get(filePath).toAbsolutePath().normalize();
-        DocumentParser parser = new ApacheTikaDocumentParser();
-        Document document = loadDocument(path.toString(), parser);
-        // 删除临时文件
-        FileUtils.deleteFile(filePath);
-        ingestor.ingest(document);
-    }
 
     @GetMapping("/conversation-history")
     public Result<List<ChatSessionResponse>> queryChatConversationHistory(Long userId) {
@@ -167,6 +90,6 @@ public class ChatController {
 
     @GetMapping("/messages")
     public Result<List<ChatMessageResponse>> queryHistoryMessages(String memoryId) {
-        return chatService.queryHistoryMessages(memoryId);
+        return Result.success(chatService.queryHistoryMessages(memoryId));
     }
 }

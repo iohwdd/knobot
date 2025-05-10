@@ -63,8 +63,9 @@ create table user_info
     username    varchar(50)                         not null,
     password    varchar(255)                        not null,
     email       varchar(100)                        null,
-    nickname    varchar(50)                         null,
     avatar_url  varchar(255)                        null,
+    nickname    varchar(50)                         null,
+    description varchar(200)                        null,
     create_time timestamp default CURRENT_TIMESTAMP null,
     update_time timestamp default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
     constraint email

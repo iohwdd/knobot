@@ -214,12 +214,6 @@
                 <module>knobot-service</module>
             </modules>
         </profile>
-        <profile>
-            <id>lib-modules</id>
-            <modules>
-                <module>knobot-pojo</module>
-            </modules>
-        </profile>
     </profiles>
 
 </project>

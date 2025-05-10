@@ -74,6 +74,11 @@ public interface UserInfoService {
      */
     UserInfoResponse login(HttpServletRequest req, HttpServletResponse resp, LoginCommand request);
 
+    /**
+     * 登出
+     * @param resp
+     * @param req
+     */
     void logout(HttpServletResponse resp, HttpServletRequest req);
 
     /**
