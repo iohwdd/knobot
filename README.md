@@ -1,6 +1,5 @@
 # 开发中
 
-开发QQ群：970315394
 
 ## 环境配置
 1. 大模型api-key获取：阿里百炼平台 https://bailian.console.aliyun.com/?spm=5176.29597918.J_SEsSjsNv72yRuRFS2VknO.2.635b7ca0Mz7cuE&tab=model#/api-key
@@ -15,8 +14,7 @@
 
 6. 前端启动：代码在 https://github.com/iohwdd/knobot_frontend ，依次执行`npm install` `npm run dev` 即可
 
-# 页面效果展示
-整个项目还在开发过程中，功能尚未完善，存在许多问题，期待大家指正，更期待参与fork贡献😊
+# 页面效果
 ![image](https://github.com/user-attachments/assets/938dd639-7588-4e07-9e2b-d8192c80d28a)
 
 ![image](https://github.com/user-attachments/assets/f2889211-19d1-4e1d-af5e-ec557f96033d)
