@@ -3,7 +3,6 @@ package com.iohw.knobot.chat.service;
 import com.iohw.knobot.chat.domain.vo.request.ChatRequest;
 import com.iohw.knobot.chat.domain.vo.response.ChatMessageResponse;
 import com.iohw.knobot.chat.domain.vo.response.FileUploadResponse;
-import com.iohw.knobot.common.Result;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  * @date: 2025/4/13 18:16
  * @description:
  */
-public interface ChatService {
+public interface IChatService {
     /**
      * 流式对话
      * @param memoryId

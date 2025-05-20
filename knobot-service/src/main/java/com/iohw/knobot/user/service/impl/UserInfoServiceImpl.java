@@ -16,7 +16,7 @@ import com.iohw.knobot.user.mapper.UserInfoMapper;
 import com.iohw.knobot.user.domain.convert.UserInfoConverter;
 import com.iohw.knobot.user.domain.vo.response.UserInfoResponse;
 import com.iohw.knobot.user.domain.vo.response.UserDetailInfoResp;
-import com.iohw.knobot.user.service.UserInfoService;
+import com.iohw.knobot.user.service.IUserInfoService;
 import com.iohw.knobot.utils.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,7 +42,7 @@ import static com.iohw.knobot.common.constant.Constants.REQ_CONTEXT;
  */
 @Service
 @RequiredArgsConstructor
-public class UserInfoServiceImpl implements UserInfoService {
+public class UserInfoServiceImpl implements IUserInfoService {
     private final UserInfoMapper userInfoMapper;
     private final StringRedisTemplate stringRedisTemplate;
     private final EmailUtil emailUtil;

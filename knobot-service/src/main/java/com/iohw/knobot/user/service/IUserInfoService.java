@@ -20,7 +20,7 @@ import java.util.List;
  * @date: 2025/5/4 22:27
  * @description: 用户信息服务接口
  */
-public interface UserInfoService {
+public interface IUserInfoService {
     String TOKEN = "token";
     /**
      * 创建用户

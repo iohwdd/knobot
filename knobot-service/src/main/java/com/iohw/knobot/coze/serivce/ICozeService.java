@@ -8,6 +8,6 @@ import com.iohw.knobot.chat.domain.vo.request.DayWhetherRequest;
  * @date: 2025/4/29 23:22
  * @description:
  */
-public interface CozeService {
+public interface ICozeService {
     WeatherDataDTO getWeatherData(DayWhetherRequest request);
 }

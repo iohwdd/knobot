@@ -15,7 +15,7 @@ import java.util.List;
  * @date: 2025/4/13 17:24
  * @description:
  */
-public interface ConversationSideBarService {
+public interface IConversationSideBarService {
     Result<List<ChatSessionResponse>> queryChatConversation(long userId);
 
     Result<ChatConversionItemResponse> createChatConversation(CreateConversationCommand userId);

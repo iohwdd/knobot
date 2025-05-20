@@ -3,9 +3,8 @@ package com.iohw.knobot.user.controller;
 import com.iohw.knobot.common.Result;
 import com.iohw.knobot.user.domain.vo.response.UserDetailInfoResp;
 import com.iohw.knobot.user.domain.vo.request.QueryUserDetailInfoRequest;
-import com.iohw.knobot.user.service.UserInfoService;
+import com.iohw.knobot.user.service.IUserInfoService;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.validation.annotation.Validated;
@@ -23,11 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user-query")
 @RequiredArgsConstructor
 public class UserQueryController {
-    private final UserInfoService userInfoService;
+    private final IUserInfoService IUserInfoService;
 
     @PostMapping("/queryUserDetailInfo")
     public Result<UserDetailInfoResp> queryUserDetailInfo(@Validated @RequestBody QueryUserDetailInfoRequest request) {
-        UserDetailInfoResp userDetailInfoResp = userInfoService.queryUserDetailInfo(request);
+        UserDetailInfoResp userDetailInfoResp = IUserInfoService.queryUserDetailInfo(request);
         return Result.success(userDetailInfoResp);
     }
 }

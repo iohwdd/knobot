@@ -11,8 +11,12 @@ import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.chat.StreamingChatLanguageModel;
 import dev.langchain4j.model.input.PromptTemplate;
+import dev.langchain4j.model.openai.OpenAiChatModel;
+import dev.langchain4j.model.openai.OpenAiStreamingChatModel;
 import dev.langchain4j.rag.DefaultRetrievalAugmentor;
 import dev.langchain4j.rag.RetrievalAugmentor;
+import dev.langchain4j.rag.content.aggregator.ContentAggregator;
+import dev.langchain4j.rag.content.aggregator.DefaultContentAggregator;
 import dev.langchain4j.rag.content.injector.DefaultContentInjector;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.rag.content.retriever.WebSearchContentRetriever;
@@ -26,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -67,7 +72,6 @@ public class AssistantService {
                         .promptTemplate(PromptTemplate.from("{{userMessage}}\n文档/文件/附件的内容如下，你可以基于下面的内容回答:\n{{contents}}"))
                         .build())
                 .build();
-
         return AiServices.builder(RAGAssistant.class)
                 .streamingChatLanguageModel(streamingChatLanguageModel)
                 .retrievalAugmentor(retrievalAugmentor)
@@ -85,16 +89,15 @@ public class AssistantService {
                 .apiKey(webSearchProperties.getApiKey())
                 .engine(webSearchProperties.getEngine())
                 .build();
-
         EmbeddingStoreContentRetriever embeddingStoreContentRetriever = contentRetrieverFactory.createRetriever(null, null);
         WebSearchContentRetriever webSearchContentRetriever = WebSearchContentRetriever.builder()
                 .webSearchEngine(searchEngine)
                 .maxResults(3)
                 .build();
-
         QueryRouter queryRouter = new DefaultQueryRouter(embeddingStoreContentRetriever, webSearchContentRetriever);
         RetrievalAugmentor retrievalAugmentor = DefaultRetrievalAugmentor.builder()
                 .queryRouter(queryRouter)
+            .contentAggregator(new DefaultContentAggregator())
                 .contentInjector(DefaultContentInjector.builder()
                         .promptTemplate(PromptTemplate.from("{{userMessage}}\n文档/文件/附件的内容如下，你可以基于下面的内容回答:\n{{contents}}"))
                         .build())

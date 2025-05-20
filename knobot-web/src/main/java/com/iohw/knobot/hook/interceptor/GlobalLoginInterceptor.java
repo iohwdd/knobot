@@ -2,7 +2,7 @@ package com.iohw.knobot.hook.interceptor;
 
 import com.iohw.knobot.common.ReqContext;
 import com.iohw.knobot.user.domain.entity.UserInfoDO;
-import com.iohw.knobot.user.service.UserInfoService;
+import com.iohw.knobot.user.service.IUserInfoService;
 import com.iohw.knobot.utils.ThreadLocalUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import static com.iohw.knobot.common.constant.Constants.REQ_CONTEXT;
-import static com.iohw.knobot.user.service.UserInfoService.TOKEN;
+import static com.iohw.knobot.user.service.IUserInfoService.TOKEN;
 
 /**
  * @author: iohw
@@ -24,7 +24,7 @@ import static com.iohw.knobot.user.service.UserInfoService.TOKEN;
 @RequiredArgsConstructor
 public class GlobalLoginInterceptor implements HandlerInterceptor {
     private final StringRedisTemplate stringRedisTemplate;
-    private final UserInfoService userInfoService;
+    private final IUserInfoService IUserInfoService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -53,7 +53,7 @@ public class GlobalLoginInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        UserInfoDO user = userInfoService.getUserById(Long.parseLong(userId));
+        UserInfoDO user = IUserInfoService.getUserById(Long.parseLong(userId));
         if (user == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;

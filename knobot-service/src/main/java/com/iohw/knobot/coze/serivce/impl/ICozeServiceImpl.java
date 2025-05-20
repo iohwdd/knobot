@@ -5,7 +5,7 @@ import com.iohw.knobot.coze.domain.vo.request.CozeWorkFlowRequest;
 import com.iohw.knobot.coze.domain.vo.response.CozeWorkFlowResponse;
 import com.iohw.knobot.chat.domain.dto.WeatherDataDTO;
 import com.iohw.knobot.chat.domain.vo.request.DayWhetherRequest;
-import com.iohw.knobot.coze.serivce.CozeService;
+import com.iohw.knobot.coze.serivce.ICozeService;
 import com.iohw.knobot.coze.CozeClient;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
  * @description:
  */
 @Service
-public class CozeServiceImpl implements CozeService {
+public class ICozeServiceImpl implements ICozeService {
     @Override
     public WeatherDataDTO getWeatherData(DayWhetherRequest request) {
         CozeWorkFlowRequest<DayWhetherRequest> workFlowRequest = new CozeWorkFlowRequest<>();

@@ -9,7 +9,7 @@ import com.iohw.knobot.libary.domain.vo.request.QueryLibraryListRequest;
 import com.iohw.knobot.libary.domain.vo.request.UpdateKnowledgeLibCommand;
 import com.iohw.knobot.libary.mapper.KnowledgeLibDocumentMapper;
 import com.iohw.knobot.libary.mapper.KnowledgeLibMapper;
-import com.iohw.knobot.libary.service.KnowledgeLibService;
+import com.iohw.knobot.libary.service.IKnowledgeLibService;
 import com.iohw.knobot.libary.domain.vo.response.KnowledgeLibNameResponse;
 import com.iohw.knobot.libary.domain.vo.response.KnowledgeLibResponse;
 import com.iohw.knobot.utils.IdGeneratorUtil;
@@ -29,7 +29,7 @@ import static dev.langchain4j.store.embedding.filter.MetadataFilterBuilder.metad
  */
 @Service
 @RequiredArgsConstructor
-public class KnowledgeLibServiceImpl implements KnowledgeLibService {
+public class IKnowledgeLibServiceImpl implements IKnowledgeLibService {
     private final KnowledgeLibDocumentMapper documentMapper;
     private final KnowledgeLibMapper knowledgeLibMapper;
     private final KnowledgeLibConvert knowledgeLibConvert;

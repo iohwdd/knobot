@@ -3,8 +3,8 @@ package com.iohw.knobot.library.controller;
 import com.iohw.knobot.libary.domain.vo.request.QueryDocumentLibRequest;
 import com.iohw.knobot.libary.domain.vo.request.QueryLibraryDetailListRequest;
 import com.iohw.knobot.libary.domain.vo.request.QueryLibraryListRequest;
-import com.iohw.knobot.libary.service.KnowledgeLibDocumentService;
-import com.iohw.knobot.libary.service.KnowledgeLibService;
+import com.iohw.knobot.libary.service.IKnowledgeLibDocumentService;
+import com.iohw.knobot.libary.service.IKnowledgeLibService;
 import com.iohw.knobot.libary.domain.vo.response.KnowledgeLibDocumentResponse;
 import com.iohw.knobot.libary.domain.vo.response.KnowledgeLibNameResponse;
 import com.iohw.knobot.libary.domain.vo.response.KnowledgeLibResponse;
@@ -25,21 +25,21 @@ import java.util.List;
 @RequestMapping("/library")
 @RequiredArgsConstructor
 public class LibraryQueryController {
-    private final KnowledgeLibService knowledgeLibService;
-    private final KnowledgeLibDocumentService knowledgeLibDocumentService;
+    private final IKnowledgeLibService IKnowledgeLibService;
+    private final IKnowledgeLibDocumentService IKnowledgeLibDocumentService;
 
     @GetMapping("/queryLibraryDetailList")
     public Result<List<KnowledgeLibResponse>> queryLibraryDetailList(QueryLibraryDetailListRequest request) {
-        return Result.success(knowledgeLibService.queryLibraryDetailList(request));
+        return Result.success(IKnowledgeLibService.queryLibraryDetailList(request));
     }
 
     @GetMapping("/queryLibraryList")
     public Result<List<KnowledgeLibNameResponse>> queryLibraryList(QueryLibraryListRequest request) {
-        return Result.success(knowledgeLibService.queryKnowledgeLibList(request));
+        return Result.success(IKnowledgeLibService.queryKnowledgeLibList(request));
     }
 
     @GetMapping("/queryLibraryDocumentList")
     public Result<List<KnowledgeLibDocumentResponse>> queryLibraryDocumentList(QueryDocumentLibRequest request) {
-        return Result.success(knowledgeLibDocumentService.queryDocumentList(request.getKnowledgeLibId()));
+        return Result.success(IKnowledgeLibDocumentService.queryDocumentList(request.getKnowledgeLibId()));
     }
 }

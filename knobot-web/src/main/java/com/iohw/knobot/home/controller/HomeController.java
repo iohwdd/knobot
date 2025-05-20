@@ -4,7 +4,7 @@ import com.iohw.knobot.chat.domain.vo.request.SubmitIssueCommand;
 import com.iohw.knobot.common.Result;
 import com.iohw.knobot.chat.domain.dto.WeatherDataDTO;
 import com.iohw.knobot.chat.domain.vo.request.DayWhetherRequest;
-import com.iohw.knobot.coze.serivce.CozeService;
+import com.iohw.knobot.coze.serivce.ICozeService;
 import com.iohw.knobot.utils.EmailUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/home")
 @RequiredArgsConstructor
 public class HomeController {
-    private final CozeService cozeService;
+    private final ICozeService ICozeService;
     private final EmailUtil emailUtil;
 
     @PostMapping("/submitIssue")
@@ -35,6 +35,6 @@ public class HomeController {
 
     @PostMapping("/getWeather")
     public Result<WeatherDataDTO> getWeather(@RequestBody DayWhetherRequest request) {
-        return Result.success(cozeService.getWeatherData(request));
+        return Result.success(ICozeService.getWeatherData(request));
     }
 }

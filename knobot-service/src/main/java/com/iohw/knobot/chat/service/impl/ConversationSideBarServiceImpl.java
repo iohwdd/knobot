@@ -1,6 +1,5 @@
 package com.iohw.knobot.chat.service.impl;
 
-import com.iohw.knobot.chat.domain.convert.ChatMessageConverter;
 import com.iohw.knobot.chat.domain.entity.ChatMessageDO;
 import com.iohw.knobot.chat.domain.convert.ChatConversationConverter;
 import com.iohw.knobot.common.enums.ChatConversionEnum;
@@ -9,11 +8,11 @@ import com.iohw.knobot.chat.mapper.ChatConversationMapper;
 import com.iohw.knobot.chat.domain.vo.request.CreateConversationCommand;
 import com.iohw.knobot.chat.domain.vo.request.DeleteConversationCommand;
 import com.iohw.knobot.chat.domain.vo.request.UpdateConversationTitleCommand;
-import com.iohw.knobot.chat.service.ConversationSideBarService;
+import com.iohw.knobot.chat.service.IConversationSideBarService;
 import com.iohw.knobot.chat.domain.vo.response.ChatConversionItemResponse;
 import com.iohw.knobot.common.Result;
 import com.iohw.knobot.utils.IdGeneratorUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 import com.iohw.knobot.chat.domain.vo.response.ChatSessionResponse;
 import com.iohw.knobot.chat.domain.entity.ChatConversationDO;
@@ -30,7 +29,7 @@ import static com.iohw.knobot.chat.domain.common.constant.ChatConstant.NEW_SESSI
  */
 @Service
 @RequiredArgsConstructor
-public class ConversationSideBarServiceImpl implements ConversationSideBarService {
+public class ConversationSideBarServiceImpl implements IConversationSideBarService {
     private final ChatConversationMapper chatConversationMapper;
     private final ChatMessageMapper chatMessageMapper;
     private final ChatConversationConverter chatConversationConverter;

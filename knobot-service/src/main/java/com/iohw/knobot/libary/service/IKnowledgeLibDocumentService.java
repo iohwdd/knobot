@@ -13,7 +13,7 @@ import java.util.List;
  * @date: 2025/4/25 21:46
  * @description: 知识库文档服务接口
  */
-public interface KnowledgeLibDocumentService {
+public interface IKnowledgeLibDocumentService {
     /**
      * 添加文档
      */

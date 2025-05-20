@@ -1,5 +1,6 @@
 package com.iohw.knobot.libary.service.impl;
 
+import com.iohw.knobot.libary.service.IKnowledgeLibDocumentService;
 import com.iohw.knobot.upload.dto.FileUploadDTO;
 import com.iohw.knobot.libary.domain.convert.KnowledgeLibDocumentConvert;
 import com.iohw.knobot.libary.domain.entity.KnowledgeLibDocumentDO;
@@ -7,8 +8,7 @@ import com.iohw.knobot.libary.domain.vo.request.CreateKnowledgeLibDocCommand;
 import com.iohw.knobot.libary.domain.vo.request.DeleteKnowledgeLibDocCommand;
 import com.iohw.knobot.libary.domain.vo.request.UpdateKnowledgeLibDocCommand;
 import com.iohw.knobot.libary.mapper.KnowledgeLibDocumentMapper;
-import com.iohw.knobot.libary.service.KnowledgeLibDocumentService;
-import com.iohw.knobot.libary.service.KnowledgeLibService;
+import com.iohw.knobot.libary.service.IKnowledgeLibService;
 import com.iohw.knobot.libary.domain.vo.response.KnowledgeLibDocumentResponse;
 import com.iohw.knobot.upload.FileUploadFactory;
 import com.iohw.knobot.upload.LocalUploadFileStrategy;
@@ -34,9 +34,9 @@ import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.load
  */
 @Service
 @RequiredArgsConstructor
-public class KnowledgeLibDocumentServiceImpl implements KnowledgeLibDocumentService {
+public class KnowledgeLibDocumentServiceImpl implements IKnowledgeLibDocumentService {
     private final KnowledgeLibDocumentMapper documentMapper;
-    private final KnowledgeLibService knowledgeLibService;
+    private final IKnowledgeLibService IKnowledgeLibService;
     private final EmbeddingStoreIngestor ingestor;
     private final FileUploadFactory fileUploadFactory;
     private final KnowledgeLibDocumentConvert documentConvert;
@@ -138,6 +138,6 @@ public class KnowledgeLibDocumentServiceImpl implements KnowledgeLibDocumentServ
      */
     private void updateKnowledgeLibDocumentCount(String knowledgeLibId) {
         int count = queryDocumentCount(knowledgeLibId);
-        knowledgeLibService.updateDocumentCount(knowledgeLibId, count);
+        IKnowledgeLibService.updateDocumentCount(knowledgeLibId, count);
     }
 }

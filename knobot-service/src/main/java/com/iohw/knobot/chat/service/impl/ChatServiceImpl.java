@@ -4,7 +4,6 @@ import com.iohw.knobot.chat.ai.assistant.AssistantService;
 import com.iohw.knobot.chat.ai.assistant.IAssistant.StreamingAssistant;
 import com.iohw.knobot.chat.ai.assistant.IAssistant.SummarizeAssistant;
 import com.iohw.knobot.chat.ai.assistant.IAssistant.WebSearchAssistant;
-import com.iohw.knobot.chat.domain.convert.ChatConversationConverter;
 import com.iohw.knobot.chat.domain.convert.ChatMessageConverter;
 import com.iohw.knobot.chat.domain.entity.ChatMessageDO;
 import com.iohw.knobot.chat.domain.vo.request.ChatRequest;
@@ -12,15 +11,13 @@ import com.iohw.knobot.chat.domain.vo.request.UpdateConversationTitleCommand;
 import com.iohw.knobot.chat.domain.vo.response.ChatMessageResponse;
 import com.iohw.knobot.chat.domain.vo.response.FileUploadResponse;
 import com.iohw.knobot.chat.mapper.ChatMessageMapper;
-import com.iohw.knobot.chat.service.ChatService;
-import com.iohw.knobot.chat.service.ConversationSideBarService;
-import com.iohw.knobot.common.Result;
+import com.iohw.knobot.chat.service.IChatService;
+import com.iohw.knobot.chat.service.IConversationSideBarService;
 import com.iohw.knobot.upload.LocalUploadFileStrategy;
 import com.iohw.knobot.upload.UploadFileStrategy;
 import com.iohw.knobot.upload.dto.FileUploadDTO;
 import com.iohw.knobot.utils.FileUtils;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,13 +46,13 @@ import static dev.langchain4j.data.document.loader.FileSystemDocumentLoader.load
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ChatServiceImpl implements ChatService {
+public class ChatServiceImpl implements IChatService {
     private final ChatMessageMapper chatMessageMapper;
     private final ChatMessageConverter chatMessageConverter;
     private final AssistantService assistantService;
     private final SummarizeAssistant summarizeAssistant;
     private final WebSearchAssistant webSearchAssistant;
-    private final ConversationSideBarService conversationSideBarService;
+    private final IConversationSideBarService IConversationSideBarService;
     private final EmbeddingStoreIngestor ingestor;
 
     private final Map<String, String> filePathMap = new HashMap<>();
@@ -95,7 +92,7 @@ public class ChatServiceImpl implements ChatService {
         if (isFirstQuestion) {
             log.info("用户 {} 在会话 {} 中首次提问", request.getUserId(), memoryId);
             String newTitle = summarizeAssistant.summarize(request.getUserMessage());
-            conversationSideBarService.updateChatConversationTitle(
+            IConversationSideBarService.updateChatConversationTitle(
                 UpdateConversationTitleCommand.builder()
                     .memoryId(memoryId)
                     .newTitle(newTitle)
@@ -152,6 +149,7 @@ public class ChatServiceImpl implements ChatService {
         Document document = loadDocument(path.toString(), parser);
         // 删除临时文件
         FileUtils.deleteFile(filePath);
+
         ingestor.ingest(document);
     }
 }
