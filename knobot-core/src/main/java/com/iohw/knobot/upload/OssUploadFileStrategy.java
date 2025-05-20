@@ -1,6 +1,6 @@
 package com.iohw.knobot.upload;
 
-import com.iohw.knobot.upload.dto.FileUploadDTO;
+import com.iohw.knobot.common.dto.FileUploadDTO;
 import com.iohw.knobot.common.exception.FileUploadException;
 import com.iohw.knobot.utils.OssUtil;
 import org.springframework.stereotype.Component;

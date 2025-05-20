@@ -1,9 +1,14 @@
 package com.iohw.knobot.user.service.impl;
 
 import cn.hutool.core.util.IdUtil;
+
+import com.alibaba.fastjson.JSON;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.iohw.knobot.common.ReqContext;
+import com.iohw.knobot.common.constant.Constants;
+import com.iohw.knobot.common.dto.TokenPayloadDTO;
+import com.iohw.knobot.common.enums.ErrorEnum;
 import com.iohw.knobot.common.exception.BusinessException;
 import com.iohw.knobot.user.domain.entity.UserInfoDO;
 import com.iohw.knobot.user.domain.vo.request.BindEmailCommand;
@@ -18,6 +23,8 @@ import com.iohw.knobot.user.domain.vo.response.UserInfoResponse;
 import com.iohw.knobot.user.domain.vo.response.UserDetailInfoResp;
 import com.iohw.knobot.user.service.IUserInfoService;
 import com.iohw.knobot.utils.*;
+
+import cn.hutool.crypto.digest.BCrypt;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -34,6 +42,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.iohw.knobot.common.constant.Constants.REQ_CONTEXT;
+import static net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
 
 /**
  * @author: iohw
@@ -53,14 +62,88 @@ public class UserInfoServiceImpl implements IUserInfoService {
             .build();
 
     @Override
-    public Long createUser(RegistryCommand registryCommand) {
+    public UserInfoResponse login(HttpServletRequest req, HttpServletResponse resp, LoginCommand request) {
+        UserInfoDO user = userInfoMapper.selectByUsername(request.getUsername());
+        // 账号或密码错误
+        if (user == null || !BCrypt.checkpw(request.getPassword(), user.getPassword())) {
+            return null;
+        }
+
+
+        getAccessTokenAndRefresh(resp, TokenPayloadDTO.builder()
+            .username(user.getUsername())
+            .userId(user.getUserId())
+            .avatarUrl(user.getAvatarUrl())
+            .build());
+
+        // UserInfoResponse dto = userInfoConverter.toDto(user);
+
+        return UserInfoResponse.builder()
+            .userId(user.getUserId())
+            .userName(user.getUsername())
+            .nickName(user.getNickname())
+            .avatarUrl(user.getAvatarUrl())
+            .build();
+    }
+
+    @Override
+    public String refresh(HttpServletResponse resp, String refreshToken) {
+        Boolean flag = stringRedisTemplate.hasKey(refreshToken);
+
+        if (Boolean.FALSE.equals(flag)) {
+            throw new BusinessException(ErrorEnum.REFRESH_TOKEN_INVALID.getDesc());
+        }
+
+        // 校验refreshToken是否有效
+        String json = stringRedisTemplate.opsForValue()
+            .get(refreshToken);
+        TokenPayloadDTO requestInfo = JSON.parseObject(json, TokenPayloadDTO.class);
+        if(refreshToken == null) {
+            throw new BusinessException(ErrorEnum.REFRESH_TOKEN_INVALID.getDesc());
+        }
+
+        // 删除旧的refreshToken
+        stringRedisTemplate.delete(refreshToken);
+        return getAccessTokenAndRefresh(resp, requestInfo);
+    }
+
+    private String getAccessTokenAndRefresh(HttpServletResponse resp, TokenPayloadDTO requestInfo) {
+        if(requestInfo == null) {
+            throw new BusinessException(ErrorEnum.REFRESH_TOKEN_INVALID.getDesc());
+        }
+        // 生成accessToken与refreshToken
+        String accessToken = JwtUtils.generateAccessToken(requestInfo);
+        String refreshTokenKey = UUID.randomUUID().toString();
+
+        // redis/cookie 保存 refreshToken
+        stringRedisTemplate.opsForValue().set(refreshTokenKey, JSON.toJSONString(requestInfo), Duration.ofHours(1));
+        CookieUtils.addCookie(resp, Constants.REFRESH_TOKEN_COOKIE_NAME, refreshTokenKey, Constants.REFRESH_TOKEN_EXPIRE_TIME);
+        // cookie保存accessToken
+        CookieUtils.addCookie(resp, Constants.ACCESS_TOKEN_COOKIE_NAME, accessToken, Constants.ACCESS_TOKEN_EXPIRE_TIME);
+
+
+        return accessToken;
+    }
+
+    @Override
+    public void logout(HttpServletResponse resp, HttpServletRequest req) {
+        stringRedisTemplate.delete(Constants.REFRESH_TOKEN_COOKIE_NAME);
+
+        CookieUtils.deleteCookieByName(req, resp, Constants.REFRESH_TOKEN_COOKIE_NAME);
+        CookieUtils.deleteCookieByName(req, resp, Constants.ACCESS_TOKEN_COOKIE_NAME);
+
+        ThreadLocalUtils.remove(REQ_CONTEXT);
+    }
+
+    @Override
+    public Long registry(RegistryCommand registryCommand) {
         UserInfoDO user = getUserByUsername(registryCommand.getUsername());
         if(user != null) {
             throw new BusinessException("用户名已存在");
         }
         UserInfoDO userInfoDO = new UserInfoDO();
         userInfoDO.setUsername(registryCommand.getUsername());
-        userInfoDO.setPassword(registryCommand.getPassword());
+        userInfoDO.setPassword(BCrypt.hashpw(registryCommand.getPassword(), BCrypt.gensalt()));
         userInfoDO.setUserId(IdUtil.getSnowflake().nextId());
         userInfoDO.setNickname(NicknameGenerator.generateNickname());
         userInfoMapper.insert(userInfoDO);
@@ -102,10 +185,12 @@ public class UserInfoServiceImpl implements IUserInfoService {
             }
         }
 
-
-        userInfo.setPassword(modifyUserInfoCommand.getNewPassword());
-        userInfo.setNickname(modifyUserInfoCommand.getNickname());
-        userInfo.setDescription(modifyUserInfoCommand.getDescription());
+        if(StringUtils.hasText(modifyUserInfoCommand.getNewPassword()))
+            userInfo.setPassword(BCrypt.hashpw(modifyUserInfoCommand.getNewPassword(), BCrypt.gensalt()));
+        if(StringUtils.hasText(modifyUserInfoCommand.getNickname()))
+            userInfo.setNickname(modifyUserInfoCommand.getNickname());
+        if(StringUtils.hasText(modifyUserInfoCommand.getDescription()))
+            userInfo.setDescription(modifyUserInfoCommand.getDescription());
         userInfoMapper.updateById(userInfo);
     }
 
@@ -119,74 +204,6 @@ public class UserInfoServiceImpl implements IUserInfoService {
         return userInfoMapper.selectList();
     }
 
-    @Override
-    public UserInfoResponse login(HttpServletRequest req, HttpServletResponse resp, LoginCommand request) {
-        UserInfoDO user = userInfoMapper.selectByUsername(request.getUsername());
-        // 用户不存在或密码错误
-        if (user == null || !request.getPassword().equals(user.getPassword())) {
-            return null;
-        }
-
-        // 删除旧token
-        Cookie[] cookies = req.getCookies();
-        if(cookies != null) {
-            for (Cookie cookie : cookies) {
-                if(cookie.getName().equals(TOKEN)) {
-                    stringRedisTemplate.delete(cookie.getValue());
-                    // 删除旧cookie
-                    Cookie del = new Cookie(cookie.getName(), null);
-                    del.setMaxAge(0);
-                    del.setPath("/");
-                    resp.addCookie(del);
-                    break;
-                }
-            }
-        }
-
-        // redis实现共享session
-        String token = UUID.randomUUID().toString();
-
-        if(Boolean.FALSE.equals(stringRedisTemplate.hasKey(token))) {
-            stringRedisTemplate.opsForValue().set(token, String.valueOf(user.getUserId()),7, TimeUnit.DAYS);
-        }
-
-        // 设置上下文用户信息
-        ReqContext reqContext = ReqContext.builder()
-                .userId(user.getUserId())
-                .userName(user.getUsername())
-                .avatarUrl(user.getAvatarUrl())
-                .nickName(user.getNickname())
-                .build();
-        ThreadLocalUtils.set(REQ_CONTEXT, reqContext);
-
-        UserInfoResponse dto = userInfoConverter.toDto(user);
-
-        // 响应添加cookie
-        Cookie cookie = new Cookie(TOKEN, token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setMaxAge(7 * 24 * 60 * 60);
-        cookie.setPath("/");
-        resp.addCookie(cookie);
-        resp.addCookie(new Cookie(TOKEN, token));
-
-        return dto;
-    }
-
-    @Override
-    public void logout(HttpServletResponse resp, HttpServletRequest req) {
-        Cookie[] cookies = req.getCookies();
-        for (Cookie cookie : cookies) {
-            if(cookie.getName().equals(TOKEN)) {
-                stringRedisTemplate.delete(cookie.getValue());
-            }
-        }
-
-        Cookie cookie = new Cookie(TOKEN, null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        resp.addCookie(cookie);
-    }
 
     @Override
     public UserDetailInfoResp queryUserDetailInfo(QueryUserDetailInfoRequest request) {
@@ -196,7 +213,6 @@ public class UserInfoServiceImpl implements IUserInfoService {
         }
         long joinDays = Duration.between(userInfoDO.getCreateTime(), LocalDateTime.now()).toDays();
         return UserDetailInfoResp.builder()
-                .nickName(userInfoDO.getNickname())
                 .description(userInfoDO.getDescription())
                 .avatarUrl(userInfoDO.getAvatarUrl())
                 .joinDays(joinDays)

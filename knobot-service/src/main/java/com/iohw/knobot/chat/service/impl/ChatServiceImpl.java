@@ -15,7 +15,7 @@ import com.iohw.knobot.chat.service.IChatService;
 import com.iohw.knobot.chat.service.IConversationSideBarService;
 import com.iohw.knobot.upload.LocalUploadFileStrategy;
 import com.iohw.knobot.upload.UploadFileStrategy;
-import com.iohw.knobot.upload.dto.FileUploadDTO;
+import com.iohw.knobot.common.dto.FileUploadDTO;
 import com.iohw.knobot.utils.FileUtils;
 
 import org.springframework.stereotype.Service;

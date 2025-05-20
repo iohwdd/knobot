@@ -15,5 +15,5 @@ public class ReqContext {
     private String userName;
     private String nickName;
     private String avatarUrl;
-
+    private String accessToken;
 }

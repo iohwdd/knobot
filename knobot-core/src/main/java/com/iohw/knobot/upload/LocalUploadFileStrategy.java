@@ -1,6 +1,6 @@
 package com.iohw.knobot.upload;
 
-import com.iohw.knobot.upload.dto.FileUploadDTO;
+import com.iohw.knobot.common.dto.FileUploadDTO;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 

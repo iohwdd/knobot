@@ -1,7 +1,15 @@
 package com.iohw.knobot.hook.filter;
 
+import com.iohw.knobot.common.constant.Constants;
+import com.iohw.knobot.common.dto.TokenPayloadDTO;
+import com.iohw.knobot.utils.CookieUtils;
+import com.iohw.knobot.utils.JwtUtils;
 import com.iohw.knobot.utils.SelfTraceIdGenerator;
+import com.iohw.knobot.utils.ThreadLocalUtils;
+
 import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.slf4j.MDC;
 
 import java.io.IOException;
@@ -14,11 +22,12 @@ import java.io.IOException;
 public class ReqFilter implements Filter {
     private final String TRACE_ID = "traceId";
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest req, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         try {
             // 设置请求链路唯一标识 - traceId
             MDC.put(TRACE_ID, SelfTraceIdGenerator.generate());
-            filterChain.doFilter(servletRequest, servletResponse);
+
+            filterChain.doFilter(req, servletResponse);
         } finally {
             MDC.remove(TRACE_ID);
         }

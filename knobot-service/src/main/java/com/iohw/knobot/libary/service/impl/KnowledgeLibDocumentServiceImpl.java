@@ -1,7 +1,7 @@
 package com.iohw.knobot.libary.service.impl;
 
 import com.iohw.knobot.libary.service.IKnowledgeLibDocumentService;
-import com.iohw.knobot.upload.dto.FileUploadDTO;
+import com.iohw.knobot.common.dto.FileUploadDTO;
 import com.iohw.knobot.libary.domain.convert.KnowledgeLibDocumentConvert;
 import com.iohw.knobot.libary.domain.entity.KnowledgeLibDocumentDO;
 import com.iohw.knobot.libary.domain.vo.request.CreateKnowledgeLibDocCommand;

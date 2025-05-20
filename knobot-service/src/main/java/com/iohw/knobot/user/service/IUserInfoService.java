@@ -22,11 +22,20 @@ import java.util.List;
  */
 public interface IUserInfoService {
     String TOKEN = "token";
+
+    /**
+     * 刷新token
+     *
+     * @param resp
+     * @param refreshToken
+     * @return
+     */
+    String refresh(HttpServletResponse resp, String refreshToken);
     /**
      * 创建用户
      * @return 用户ID
      */
-    Long createUser(RegistryCommand registryCommand);
+    Long registry(RegistryCommand registryCommand);
 
     /**
      * 根据ID获取用户信息

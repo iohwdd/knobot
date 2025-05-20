@@ -18,4 +18,9 @@ public class ThreadLocalUtils {
     public static void set(final String key, final Object value) {
         threadLocal.get().put(key, value);
     }
+
+    public static void remove(final String key) {
+        threadLocal.get().remove(key);
+    }
+
 }

@@ -49,10 +49,10 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/library/createKnowledgeLibDocument")
                 .excludePathPatterns(uploadDocExcludeUrls);
 
-        // 全局登录拦截器
-//        registry.addInterceptor(globalLoginInterceptor)
-//                .addPathPatterns("/**")
-//                .excludePathPatterns(loginExcludeUrls);
+       // 全局登录拦截器
+       registry.addInterceptor(globalLoginInterceptor)
+               .addPathPatterns("/**")
+               .excludePathPatterns(loginExcludeUrls);
     }
 
     @Bean

@@ -1,4 +1,4 @@
-package com.iohw.knobot.upload.dto;
+package com.iohw.knobot.common.dto;
 
 import lombok.Builder;
 import lombok.Data;

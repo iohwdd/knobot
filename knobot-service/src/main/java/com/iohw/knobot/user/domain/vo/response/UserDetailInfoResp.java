@@ -12,7 +12,6 @@ import lombok.Data;
 @Builder
 public class UserDetailInfoResp {
     private String username;
-    private String nickName;
     private String avatarUrl;
     private String description;
     private long joinDays;

@@ -1,8 +1,13 @@
 package com.iohw.knobot.hook.interceptor;
 
 import com.iohw.knobot.common.ReqContext;
+import com.iohw.knobot.common.constant.Constants;
+import com.iohw.knobot.common.dto.TokenPayloadDTO;
+import com.iohw.knobot.common.exception.BusinessException;
 import com.iohw.knobot.user.domain.entity.UserInfoDO;
 import com.iohw.knobot.user.service.IUserInfoService;
+import com.iohw.knobot.utils.CookieUtils;
+import com.iohw.knobot.utils.JwtUtils;
 import com.iohw.knobot.utils.ThreadLocalUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,50 +28,19 @@ import static com.iohw.knobot.user.service.IUserInfoService.TOKEN;
 @Component
 @RequiredArgsConstructor
 public class GlobalLoginInterceptor implements HandlerInterceptor {
-    private final StringRedisTemplate stringRedisTemplate;
-    private final IUserInfoService IUserInfoService;
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
+        String token = CookieUtils.findValueByName(Constants.ACCESS_TOKEN_COOKIE_NAME, request);
+
+        TokenPayloadDTO tokenPayloadDTO = JwtUtils.parseToken(token);
+        if(tokenPayloadDTO == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
             return false;
         }
 
-        String token = null;
-        for (Cookie cookie : cookies) {
-            if (TOKEN.equals(cookie.getName())) {
-                token = cookie.getValue();
-                break;
-            }
-        }
-
-        if (token == null || !stringRedisTemplate.hasKey(token)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
-        }
-
-        String userId = stringRedisTemplate.opsForValue().get(token);
-        if (userId == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
-        }
-
-        UserInfoDO user = IUserInfoService.getUserById(Long.parseLong(userId));
-        if (user == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return false;
-        }
-
-        // 设置上下文用户信息
-        ReqContext reqContext = ReqContext.builder()
-                .userId(user.getUserId())
-                .userName(user.getUsername())
-                .nickName(user.getNickname())
-                .avatarUrl(user.getAvatarUrl())
-                .build();
-        ThreadLocalUtils.set(REQ_CONTEXT, reqContext);
+        // 设置用户上下文信息
+        ThreadLocalUtils.set(Constants.REQ_CONTEXT, tokenPayloadDTO);
 
         return true;
     }
