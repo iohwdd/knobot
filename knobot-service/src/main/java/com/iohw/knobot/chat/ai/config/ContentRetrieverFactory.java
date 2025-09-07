@@ -26,7 +26,7 @@ public class ContentRetrieverFactory {
      * @param memoryId
      * @param knowledgeId
      * @return
-     */
+     */ 
     public EmbeddingStoreContentRetriever createRetriever(String memoryId, String knowledgeId) {
         if(!StringUtils.hasText(memoryId)) {
             return EmbeddingStoreContentRetriever.builder()

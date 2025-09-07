@@ -51,14 +51,6 @@ public class ConversationSideBarServiceImpl implements IConversationSideBarServi
                 .userId(userId)
                 .build();
         chatConversationMapper.insert(chatConversationDO);
-        // 附上机器人问候语
-        ChatMessageDO chatMessageDO = ChatMessageDO.builder()
-                .messageId(IdGeneratorUtil.generateId())
-                .role("assistant")
-                .memoryId(memoryId)
-                .content("你好呀~很高兴能跟你交流😄")
-                .build();
-        chatMessageMapper.insert(chatMessageDO);
 
         return Result.success(ChatConversionItemResponse.builder()
                 .title(NEW_SESSION_TITLE)

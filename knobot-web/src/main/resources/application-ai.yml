@@ -40,3 +40,15 @@ llm:
   apikey: ${DEEPSEEK_API_KEY}
   model: deepseek-reasoner
   baseUrl: https://api.deepseek.com
+
+
+# 对话配置
+chat:
+  context:
+    compress-min-interval-minutes: 5                 # 压缩的最小间隔（分钟）
+    window-size: 10                                  # 上下文保留轮数
+    expire-hours: 168                                # 上下文过期时间（小时，24*7=168）
+    compression-token-threshold: 5000                # 触发压缩的最大 token 阈值
+
+coze:
+  token: ${COZE_TOKEN}

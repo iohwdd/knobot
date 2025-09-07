@@ -44,9 +44,9 @@ public class UserController {
 
     @PostMapping("/refreshToken")
     public Result<RefreshTokenResponse> refresh(@CookieValue(value = Constants.REFRESH_TOKEN_COOKIE_NAME) String refreshToken
-                                    ,HttpServletResponse resp) {
+                                    ,HttpServletRequest req, HttpServletResponse resp) {
         return Result.success(RefreshTokenResponse.builder()
-                .accessToken(userInfoService.refresh(resp, refreshToken))
+                .accessToken(userInfoService.refresh(req, resp, refreshToken))
                 .build());
     }
 

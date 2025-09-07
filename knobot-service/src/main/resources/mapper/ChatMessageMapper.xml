@@ -11,26 +11,32 @@
         <result column="role" property="role"/>
         <result column="content" property="content"/>
         <result column="enhanced_content" property="enhancedContent"/>
-        <result column="tokens" property="tokens"/>
+        <result column="user_tokens" property="userTokens"/>
+        <result column="system_tokens" property="systemTokens"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id, message_id, memory_id, role, content, enhanced_content, tokens, create_time
+        id, message_id, memory_id, role, content, enhanced_content,
+        user_tokens, system_tokens, create_time
     </sql>
 
     <insert id="batchInsert" parameterType="java.util.List">
-        INSERT INTO chat_message (message_id, memory_id, role, content, enhanced_content, tokens)
+        INSERT INTO chat_message (message_id, memory_id, role, content, enhanced_content,
+                                 user_tokens, system_tokens)
         VALUES
         <foreach collection="records" item="record" separator=",">
-            (#{record.messageId}, #{record.memoryId}, #{record.role}, #{record.content}, #{record.enhancedContent}, #{record.tokens})
+            (#{record.messageId}, #{record.memoryId}, #{record.role}, #{record.content},
+             #{record.enhancedContent}, #{record.userTokens}, #{record.systemTokens})
         </foreach>
     </insert>
-    <insert id="insert">
-        INSERT INTO chat_message (message_id, memory_id, role, content, enhanced_content, tokens)
-        VALUES
-            (#{record.messageId}, #{record.memoryId}, #{record.role}, #{record.content}, #{record.enhancedContent}, #{record.tokens})
 
+    <insert id="insert">
+        INSERT INTO chat_message (message_id, memory_id, role, content, enhanced_content,
+                                 user_tokens, system_tokens)
+        VALUES
+            (#{record.messageId}, #{record.memoryId}, #{record.role}, #{record.content},
+             #{record.enhancedContent}, #{record.userTokens}, #{record.systemTokens})
     </insert>
 
     <select id="selectByMemoryId" resultMap="BaseResultMap">
@@ -56,7 +62,14 @@
     </delete>
 
     <select id="sumTokensByMemoryId" resultType="java.lang.Integer">
-        SELECT COALESCE(SUM(tokens), 0)
+        SELECT COALESCE(SUM(user_tokens), 0)
+        FROM chat_message
+        WHERE memory_id = #{memoryId}
+    </select>
+
+    <!-- 计算系统实际消耗token -->
+    <select id="sumSystemTokensByMemoryId" resultType="java.lang.Integer">
+        SELECT COALESCE(SUM(system_tokens), 0)
         FROM chat_message
         WHERE memory_id = #{memoryId}
     </select>

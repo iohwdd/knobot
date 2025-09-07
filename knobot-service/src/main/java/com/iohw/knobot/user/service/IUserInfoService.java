@@ -24,13 +24,14 @@ public interface IUserInfoService {
     String TOKEN = "token";
 
     /**
-     * 刷新token
+     *刷新token
      *
+     * @param req
      * @param resp
      * @param refreshToken
      * @return
      */
-    String refresh(HttpServletResponse resp, String refreshToken);
+    String refresh(HttpServletRequest req, HttpServletResponse resp, String refreshToken);
     /**
      * 创建用户
      * @return 用户ID

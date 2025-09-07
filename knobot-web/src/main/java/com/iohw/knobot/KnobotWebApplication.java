@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * @author: iohw
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.iohw.knobot.**",})
 @MapperScan(basePackages = {"com.iohw.knobot.*.mapper",})
+@EnableAsync
 public class KnobotWebApplication {
 
     public static void main(String[] args) {

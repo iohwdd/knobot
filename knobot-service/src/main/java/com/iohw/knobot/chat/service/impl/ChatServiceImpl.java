@@ -52,7 +52,7 @@ public class ChatServiceImpl implements IChatService {
     private final AssistantService assistantService;
     private final SummarizeAssistant summarizeAssistant;
     private final WebSearchAssistant webSearchAssistant;
-    private final IConversationSideBarService IConversationSideBarService;
+    private final IConversationSideBarService conversationSideBarService;
     private final EmbeddingStoreIngestor ingestor;
 
     private final Map<String, String> filePathMap = new HashMap<>();
@@ -63,12 +63,6 @@ public class ChatServiceImpl implements IChatService {
         return chatMessageConverter.toDtoList(chatMessageDOS);
     }
 
-    @Override
-    public boolean isFirstQuestion(String memoryId) {
-        // 查询该会话下用户发送的消息数量
-        List<ChatMessageDO> userMessages = chatMessageMapper.selectByMemoryIdAndRole(memoryId, "user");
-        return userMessages.isEmpty();
-    }
 
     @Override
     public FileUploadResponse uploadFile4Chat(MultipartFile file) {
@@ -92,7 +86,7 @@ public class ChatServiceImpl implements IChatService {
         if (isFirstQuestion) {
             log.info("用户 {} 在会话 {} 中首次提问", request.getUserId(), memoryId);
             String newTitle = summarizeAssistant.summarize(request.getUserMessage());
-            IConversationSideBarService.updateChatConversationTitle(
+            conversationSideBarService.updateChatConversationTitle(
                 UpdateConversationTitleCommand.builder()
                     .memoryId(memoryId)
                     .newTitle(newTitle)
@@ -151,5 +145,11 @@ public class ChatServiceImpl implements IChatService {
         FileUtils.deleteFile(filePath);
 
         ingestor.ingest(document);
+    }
+
+    private boolean isFirstQuestion(String memoryId) {
+        // 查询该会话下用户发送的消息数量
+        List<ChatMessageDO> userMessages = chatMessageMapper.selectByMemoryIdAndRole(memoryId, "user");
+        return userMessages.isEmpty();
     }
 }

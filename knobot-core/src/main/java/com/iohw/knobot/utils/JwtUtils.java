@@ -44,7 +44,7 @@ public class JwtUtils {
             .addClaims(claims)
             .setIssuedAt(new Date())
             .setIssuer("knobot")
-            .setExpiration(new Date(System.currentTimeMillis() + Constants.ACCESS_TOKEN_EXPIRE_TIME))
+            .setExpiration(new Date(System.currentTimeMillis() + Constants.JWT_ACCESS_TOKEN_EXPIRE_TIME))
             .signWith(SignatureAlgorithm.HS256, Constants.KEY)
             .compact();
     }

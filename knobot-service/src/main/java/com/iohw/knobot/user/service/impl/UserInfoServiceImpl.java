@@ -87,7 +87,7 @@ public class UserInfoServiceImpl implements IUserInfoService {
     }
 
     @Override
-    public String refresh(HttpServletResponse resp, String refreshToken) {
+    public String refresh(HttpServletRequest req, HttpServletResponse resp, String refreshToken) {
         Boolean flag = stringRedisTemplate.hasKey(refreshToken);
 
         if (Boolean.FALSE.equals(flag)) {
@@ -104,6 +104,8 @@ public class UserInfoServiceImpl implements IUserInfoService {
 
         // 删除旧的refreshToken
         stringRedisTemplate.delete(refreshToken);
+        CookieUtils.deleteCookieByName(req, resp, Constants.REFRESH_TOKEN_COOKIE_NAME);
+
         return getAccessTokenAndRefresh(resp, requestInfo);
     }
 
@@ -116,7 +118,7 @@ public class UserInfoServiceImpl implements IUserInfoService {
         String refreshTokenKey = UUID.randomUUID().toString();
 
         // redis/cookie 保存 refreshToken
-        stringRedisTemplate.opsForValue().set(refreshTokenKey, JSON.toJSONString(requestInfo), Duration.ofHours(1));
+        stringRedisTemplate.opsForValue().set(refreshTokenKey, JSON.toJSONString(requestInfo), Duration.ofMillis(Constants.REFRESH_TOKEN_REDIS_EXPIRE_TIME));
         CookieUtils.addCookie(resp, Constants.REFRESH_TOKEN_COOKIE_NAME, refreshTokenKey, Constants.REFRESH_TOKEN_EXPIRE_TIME);
         // cookie保存accessToken
         CookieUtils.addCookie(resp, Constants.ACCESS_TOKEN_COOKIE_NAME, accessToken, Constants.ACCESS_TOKEN_EXPIRE_TIME);
@@ -191,6 +193,7 @@ public class UserInfoServiceImpl implements IUserInfoService {
             userInfo.setNickname(modifyUserInfoCommand.getNickname());
         if(StringUtils.hasText(modifyUserInfoCommand.getDescription()))
             userInfo.setDescription(modifyUserInfoCommand.getDescription());
+
         userInfoMapper.updateById(userInfo);
     }
 
@@ -214,6 +217,7 @@ public class UserInfoServiceImpl implements IUserInfoService {
         long joinDays = Duration.between(userInfoDO.getCreateTime(), LocalDateTime.now()).toDays();
         return UserDetailInfoResp.builder()
                 .description(userInfoDO.getDescription())
+                .nickname(userInfoDO.getNickname())
                 .avatarUrl(userInfoDO.getAvatarUrl())
                 .joinDays(joinDays)
                 .username(userInfoDO.getUsername())

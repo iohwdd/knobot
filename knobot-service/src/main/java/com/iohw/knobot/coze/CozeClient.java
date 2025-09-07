@@ -9,13 +9,20 @@ import okhttp3.*;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 /**
  * @author: iohw
  * @date: 2025/4/28 23:19
  * @description:
  */
+@Component
 public class CozeClient {
-    public static CozeWorkFlowResponse reqWorkFlow(CozeWorkFlowRequest<?> req){
+    @Value("${coze.token}")
+    private String token;
+
+    public CozeWorkFlowResponse reqWorkFlow(CozeWorkFlowRequest<?> req){
         OkHttpClient client = new OkHttpClient();
 
         String reqJson = new Gson().toJson(req);
@@ -25,7 +32,7 @@ public class CozeClient {
         Request request = new Request.Builder()
                 .url("https://api.coze.cn/v1/workflow/run")
                 .post(body)
-                .addHeader("Authorization", "Bearer pat_h1zJDVSnghxBxOcS3KlYgX8kdzOqGCjZCt5CMMSLBJWX3XXCeawkeeQgSKgsheZk")
+                .addHeader("Authorization", "Bearer " + token)
                 .addHeader("Content-Type", "application/json")
                 .build();
 
