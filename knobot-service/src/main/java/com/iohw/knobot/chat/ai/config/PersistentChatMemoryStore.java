@@ -146,6 +146,10 @@ public class PersistentChatMemoryStore implements ChatMemoryStore {
     private List<ChatMessage> rebuildAndCompressFromDatabase(String memoryId) {
         // 1. 从 MySQL 获取所有原始消息
         List<ChatMessage> allMessages = loadAllMessagesFromDatabase(memoryId);
+        boolean compressFlag = shouldCompress(memoryId, allMessages);
+        if(!compressFlag) {
+            return allMessages;
+        }
 
         // 2. 如果消息不多，直接返回
         if (allMessages.size() <= COMPRESS_THRESHOLD) {
